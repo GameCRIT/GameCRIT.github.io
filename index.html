@@ -31,23 +31,21 @@
         padding: 5px 10px;
         cursor: pointer;
       }
-      /* Loading overlay */
       #loadingOverlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7); /* Dark overlay */
+        background: rgba(0, 0, 0, 0.7);
         display: none;
         justify-content: center;
         align-items: center;
         z-index: 12;
       }
-      /* Loading spinner */
       .loading-spinner {
-        border: 4px solid #f3f3f3; /* Light grey */
-        border-top: 4px solid #3498db; /* Blue */
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
         border-radius: 50%;
         width: 40px;
         height: 40px;
@@ -79,29 +77,20 @@
       <button id="closeButton" onclick="closeVideo()">Close</button>
       <iframe id="videoFrame" width="100%" height="100%" src="about:blank"></iframe>
     </div>
-    <!-- Loading overlay and spinner -->
     <div id="loadingOverlay">
       <div class="loading-spinner"></div>
     </div>
     <script>
-      let unityInstance = null; // Store the Unity instance globally
+      let unityInstance = null;
 
       function updateIframe(url) {
         console.log("Updating iframe to:", url);
-
-        // Show the loading overlay and spinner
         document.getElementById("loadingOverlay").style.display = 'flex';
-
-        // Exit fullscreen mode if the Unity instance is in fullscreen
         if (unityInstance && unityInstance.SetFullscreen) {
-          unityInstance.SetFullscreen(0); // Set fullscreen to 0 (exit fullscreen)
+          unityInstance.SetFullscreen(0);
         }
-
-        // Set the iframe source and handle loading
         const iframe = document.getElementById("videoFrame");
         iframe.src = url;
-
-        // When the iframe finishes loading, hide the loading overlay
         iframe.onload = () => {
           document.getElementById("loadingOverlay").style.display = 'none';
           document.getElementById("videoContainer").style.display = 'block';
@@ -112,10 +101,10 @@
         const confirmClose = confirm("Are you sure you want to close the video?");
         if (confirmClose) {
           const iframe = document.getElementById("videoFrame");
-          iframe.src = "about:blank"; // Reset the iframe source
+          iframe.src = "about:blank";
           document.getElementById("videoContainer").style.display = 'none';
-          document.getElementById("loadingOverlay").style.display = 'none'; // Hide the loading overlay
-          iframe.onload = null; // Clear the onload event to avoid conflicts
+          document.getElementById("loadingOverlay").style.display = 'none';
+          iframe.onload = null;
         }
       }
 
@@ -141,12 +130,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/GameCrit.loader.js";
+      var loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/GameCrit.data",
-        frameworkUrl: buildUrl + "/GameCrit.framework.js",
-        codeUrl: buildUrl + "/GameCrit.wasm",
+        dataUrl: buildUrl + "/GameCRIT.github.io.data",
+        frameworkUrl: buildUrl + "/GameCRIT.github.io.framework.js",
+        codeUrl: buildUrl + "/GameCRIT.github.io.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Gamecrit",
@@ -174,12 +163,11 @@
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
         }).then((instance) => {
-          unityInstance = instance; // Store the Unity instance
+          unityInstance = instance;
           document.querySelector("#unity-loading-bar").style.display = "none";
           document.querySelector("#unity-fullscreen-button").onclick = () => {
             unityInstance.SetFullscreen(1);
           };
-
           var quit = document.createElement("button");
           quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
           quit.innerHTML = "Unload";
