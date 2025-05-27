@@ -1259,10 +1259,10 @@ function dbg(text) {
 // === Body ===
 
 var ASM_CONSTS = {
-  5889584: () => { Module['emscripten_get_now_backup'] = performance.now; },  
- 5889639: ($0) => { performance.now = function() { return $0; }; },  
- 5889687: ($0) => { performance.now = function() { return $0; }; },  
- 5889735: () => { performance.now = Module['emscripten_get_now_backup']; }
+  5889616: () => { Module['emscripten_get_now_backup'] = performance.now; },  
+ 5889671: ($0) => { performance.now = function() { return $0; }; },  
+ 5889719: ($0) => { performance.now = function() { return $0; }; },  
+ 5889767: () => { performance.now = Module['emscripten_get_now_backup']; }
 };
 
 
@@ -8863,7 +8863,7 @@ var ASM_CONSTS = {
   function _OpenFileDialog() {
           var input = document.createElement('input');
           input.type = 'file';
-          input.accept = 'image/png';
+          input.accept = 'image/*'; // Allow all image types, not just PNG
   
           input.onchange = function (event) {
               var file = event.target.files[0];
@@ -8872,7 +8872,12 @@ var ASM_CONSTS = {
               var reader = new FileReader();
               reader.onloadend = function () {
                   var data = reader.result.split(',')[1]; // Remove base64 metadata
-                  SendImageToUnity(data); // Call Unity function
+                  // Store the data in a global variable that Unity can access
+                  window.imageData = data;
+                  // Call a Unity method to notify that data is ready
+                  if (typeof unityInstance !== 'undefined') {
+                      unityInstance.SendMessage('ImageLoader', 'OnImageDataReady');
+                  }
               };
               reader.readAsDataURL(file);
           };
