@@ -59,7 +59,7 @@
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=100% height=100% tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -67,6 +67,11 @@
         </div>
       </div>
       <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">Gamecrit</div>
+      </div>
     </div>
     <div id="videoContainer">
       <button id="closeButton" onclick="closeVideo()">Close</button>
@@ -78,27 +83,19 @@
     <script>
       let unityInstance = null;
 
-function updateIframe(url) {
-  console.log("Raw input URL:", url);
-
-  // Convert standard YouTube links to embed links
-  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-  if (ytMatch) {
-    const videoId = ytMatch[1];
-    url = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-  }
-
-  document.getElementById("loadingOverlay").style.display = 'flex';
-  if (unityInstance && unityInstance.SetFullscreen) {
-    unityInstance.SetFullscreen(0);
-  }
-  const iframe = document.getElementById("videoFrame");
-  iframe.src = url;
-  iframe.onload = () => {
-    document.getElementById("loadingOverlay").style.display = 'none';
-    document.getElementById("videoContainer").style.display = 'block';
-  };
-}
+      function updateIframe(url) {
+        console.log("Updating iframe to:", url);
+        document.getElementById("loadingOverlay").style.display = 'flex';
+        if (unityInstance && unityInstance.SetFullscreen) {
+          unityInstance.SetFullscreen(0);
+        }
+        const iframe = document.getElementById("videoFrame");
+        iframe.src = url;
+        iframe.onload = () => {
+          document.getElementById("loadingOverlay").style.display = 'none';
+          document.getElementById("videoContainer").style.display = 'block';
+        };
+      }
 
       function closeVideo() {
         const confirmClose = confirm("Are you sure you want to close the video?");
