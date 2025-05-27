@@ -81,6 +81,14 @@
       <div class="loading-spinner"></div>
     </div>
     <script>
+
+  function SendImageToUnity(message) {
+    console.log("Message from Unity:", message);
+    if (unityInstance) {
+      unityInstance.SendMessage('GameManager', 'ReceiveFromJS', message);
+    }
+  }
+
       let unityInstance = null;
 
       function updateIframe(url) {
