@@ -1259,10 +1259,10 @@ function dbg(text) {
 // === Body ===
 
 var ASM_CONSTS = {
-  7537680: () => { Module['emscripten_get_now_backup'] = performance.now; },  
- 7537735: ($0) => { performance.now = function() { return $0; }; },  
- 7537783: ($0) => { performance.now = function() { return $0; }; },  
- 7537831: () => { performance.now = Module['emscripten_get_now_backup']; }
+  7537792: () => { Module['emscripten_get_now_backup'] = performance.now; },  
+ 7537847: ($0) => { performance.now = function() { return $0; }; },  
+ 7537895: ($0) => { performance.now = function() { return $0; }; },  
+ 7537943: () => { performance.now = Module['emscripten_get_now_backup']; }
 };
 
 
@@ -8881,6 +8881,11 @@ var ASM_CONSTS = {
       };
   
       input.click();
+    }
+
+  function _OpenURL(urlPtr) {
+      var url = UTF8ToString(urlPtr);
+      window.open(url, '_blank');
     }
 
   function _PostJSON(path, value, objectName, callback, fallback) {
@@ -18834,6 +18839,7 @@ var wasmImports = {
   "ModifyNumberWithTransaction": _ModifyNumberWithTransaction,
   "OnAuthStateChanged": _OnAuthStateChanged,
   "OpenFileDialog": _OpenFileDialog,
+  "OpenURL": _OpenURL,
   "PostJSON": _PostJSON,
   "PushJSON": _PushJSON,
   "RemoveElementInArrayField": _RemoveElementInArrayField,
