@@ -168,9 +168,12 @@ function updateIframe(url) {
         }).then((instance) => {
           unityInstance = instance;
           document.querySelector("#unity-loading-bar").style.display = "none";
-          document.querySelector("#unity-fullscreen-button").onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
+          const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
+          if (fullscreenBtn) {
+            fullscreenBtn.onclick = () => {
+              unityInstance.SetFullscreen(1);
+            };
+          }
           var quit = document.createElement("button");
           quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
           quit.innerHTML = "Unload";
