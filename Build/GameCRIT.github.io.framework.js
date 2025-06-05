@@ -1259,10 +1259,10 @@ function dbg(text) {
 // === Body ===
 
 var ASM_CONSTS = {
-  7549040: () => { Module['emscripten_get_now_backup'] = performance.now; },  
- 7549095: ($0) => { performance.now = function() { return $0; }; },  
- 7549143: ($0) => { performance.now = function() { return $0; }; },  
- 7549191: () => { performance.now = Module['emscripten_get_now_backup']; }
+  7549072: () => { Module['emscripten_get_now_backup'] = performance.now; },  
+ 7549127: ($0) => { performance.now = function() { return $0; }; },  
+ 7549175: ($0) => { performance.now = function() { return $0; }; },  
+ 7549223: () => { performance.now = Module['emscripten_get_now_backup']; }
 };
 
 
@@ -8948,6 +8948,42 @@ var ASM_CONSTS = {
           } catch (error) {
               window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
           }
+      }
+
+  function _SendGAEvent(eventName, eventData) {
+          // Convert from Unity strings to JS strings
+          var name = UTF8ToString(eventName);
+          var dataStr = UTF8ToString(eventData);
+          var data = JSON.parse(dataStr);
+          
+          // Generate or retrieve client ID
+          var clientId = localStorage.getItem('ga_client_id');
+          if (!clientId) {
+              clientId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+              localStorage.setItem('ga_client_id', clientId);
+          }
+  
+          // Create the payload
+          var payload = {
+              measurement_id: 'G-QV8Y03PMSE', // Replace with your actual ID
+              api_secret: 'gZZKQmZ3RXiCNRCceUypxQ',         // Replace with your actual secret
+              client_id: clientId,
+              events: [{
+                  name: name,
+                  params: data
+              }]
+          };
+  
+          // Use native fetch API
+          fetch('https://www.google-analytics.com/mp/collect', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          }).catch(function(e) {
+              console.error('GA Error:', e);
+          });
       }
 
   function _SetDocument(collectionPath, documentId, value, objectName, callback, fallback) {
@@ -18843,6 +18879,7 @@ var wasmImports = {
   "PostJSON": _PostJSON,
   "PushJSON": _PushJSON,
   "RemoveElementInArrayField": _RemoveElementInArrayField,
+  "SendGAEvent": _SendGAEvent,
   "SetDocument": _SetDocument,
   "SetUserProperties": _SetUserProperties,
   "SignInAnonymously": _SignInAnonymously,
