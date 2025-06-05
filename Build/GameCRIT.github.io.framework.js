@@ -1259,10 +1259,10 @@ function dbg(text) {
 // === Body ===
 
 var ASM_CONSTS = {
-  7549312: () => { Module['emscripten_get_now_backup'] = performance.now; },  
- 7549367: ($0) => { performance.now = function() { return $0; }; },  
- 7549415: ($0) => { performance.now = function() { return $0; }; },  
- 7549463: () => { performance.now = Module['emscripten_get_now_backup']; }
+  7549472: () => { Module['emscripten_get_now_backup'] = performance.now; },  
+ 7549527: ($0) => { performance.now = function() { return $0; }; },  
+ 7549575: ($0) => { performance.now = function() { return $0; }; },  
+ 7549623: () => { performance.now = Module['emscripten_get_now_backup']; }
 };
 
 
@@ -8974,20 +8974,33 @@ var ASM_CONSTS = {
                   }]
               };
   
-              // Use XMLHttpRequest which has better CORS handling in WebGL
+              // Use XMLHttpRequest with enhanced error handling
               var xhr = new XMLHttpRequest();
-              xhr.open('POST', 'https://www.google-analytics.com/mp/collect?' + 
-                      'measurement_id=G-QV8Y03PMSE&' +
-                      'api_secret=gZZKQmZ3RXiCNRCceUypxQ', true);
+              var url = 'https://www.google-analytics.com/mp/collect?' +
+                        'measurement_id=G-QV8Y03PMSE' +  // Replace with your ID
+                        'api_secret=gZZKQmZ3RXiCNRCceUypxQ';          // Replace with your secret
+              
+              xhr.open('POST', url, true);
               xhr.setRequestHeader('Content-Type', 'application/json');
               
-              xhr.onerror = function() {
-                  console.error('GA Request failed');
+              xhr.onload = function() {
+                  if (xhr.status < 200 || xhr.status >= 300) {
+                      console.error('GA Request failed with status:', xhr.status);
+                  }
               };
               
+              xhr.onerror = function() {
+                  console.error('GA Network error occurred');
+              };
+              
+              xhr.ontimeout = function() {
+                  console.error('GA Request timed out');
+              };
+              
+              xhr.timeout = 5000; // 5 second timeout
               xhr.send(JSON.stringify(payload));
           } catch (e) {
-              console.error('GA Error:', e);
+              console.error('GA Exception:', e);
           }
       }
 
