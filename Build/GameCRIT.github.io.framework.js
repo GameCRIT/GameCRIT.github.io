@@ -8951,54 +8951,97 @@ var ASM_CONSTS = {
       }
 
   function _SendGAEvent(eventName, eventData) {
+          var sendViaImageBeacon = function(url, payload) {
+              try {
+                  // Encode payload as URL parameters for GET request via image
+                  var params = new URLSearchParams();
+                  params.append('client_id', payload.client_id);
+                  
+                  // Add event data
+                  var event = payload.events[0];
+                  params.append('en', event.name); // Event name
+                  
+                  // Add custom parameters
+                  if (event.params) {
+                      Object.keys(event.params).forEach(function(key) {
+                          if (event.params[key] !== null && event.params[key] !== undefined) {
+                              params.append('ep.' + key, event.params[key].toString());
+                          }
+                      });
+                  }
+                  
+                  // Create image element to send GET request
+                  var img = new Image();
+                  img.onload = function() {
+                      console.log('GA Event sent via image beacon');
+                  };
+                  img.onerror = function() {
+                      console.log('GA Image beacon completed (error expected)');
+                  };
+                  
+                  // Use GET request with parameters
+                  var getUrl = url + '&' + params.toString();
+                  img.src = getUrl;
+                  
+              } catch (e) {
+                  console.error('Image beacon fallback failed:', e);
+              }
+          };
+  
           try {
               // Convert Unity strings to JavaScript strings
               var name = UTF8ToString(eventName);
               var data = JSON.parse(UTF8ToString(eventData));
               
-              // Get or create client ID
-              var clientId = localStorage.getItem('ga_client_id') || 
-                           (function() {
-                               var newId = Math.random().toString(36).substring(2) + 
-                                         Date.now().toString(36);
-                               localStorage.setItem('ga_client_id', newId);
-                               return newId;
-                           })();
+              console.log('Sending GA Event:', name, data);
+              
+              // Get or create client ID with fallback for restricted localStorage
+              var clientId;
+              try {
+                  clientId = localStorage.getItem('ga_client_id');
+                  if (!clientId) {
+                      clientId = Math.random().toString(36).substring(2) + 
+                                Date.now().toString(36);
+                      localStorage.setItem('ga_client_id', clientId);
+                  }
+              } catch (e) {
+                  console.warn('localStorage unavailable, using session-based client ID');
+                  clientId = window.tempClientId || (window.tempClientId = 
+                      Math.random().toString(36).substring(2) + Date.now().toString(36));
+              }
   
               // Create the payload
               var payload = {
                   client_id: clientId,
                   events: [{
                       name: name,
-                      params: data
+                      params: data.data || data
                   }]
               };
   
-              // Use XMLHttpRequest with enhanced error handling
-              var xhr = new XMLHttpRequest();
+              // Fixed URL with proper parameter separation
               var url = 'https://www.google-analytics.com/mp/collect?' +
-                        'measurement_id=G-QV8Y03PMSE' +  // Replace with your ID
-                        'api_secret=gZZKQmZ3RXiCNRCceUypxQ';          // Replace with your secret
-              
-              xhr.open('POST', url, true);
-              xhr.setRequestHeader('Content-Type', 'application/json');
-              
-              xhr.onload = function() {
-                  if (xhr.status < 200 || xhr.status >= 300) {
-                      console.error('GA Request failed with status:', xhr.status);
-                  }
-              };
-              
-              xhr.onerror = function() {
-                  console.error('GA Network error occurred');
-              };
-              
-              xhr.ontimeout = function() {
-                  console.error('GA Request timed out');
-              };
-              
-              xhr.timeout = 5000; // 5 second timeout
-              xhr.send(JSON.stringify(payload));
+                        'measurement_id=G-QV8Y03PMSE' + 
+                        '&api_secret=gZZKQmZ3RXiCNRCceUypxQ';
+  
+              // Use fetch API with no-cors mode (avoids preflight entirely)
+              if (window.fetch) {
+                  fetch(url, {
+                      method: 'POST',
+                      body: JSON.stringify(payload),
+                      mode: 'no-cors',
+                      keepalive: true
+                  })
+                  .then(function(response) {
+                      console.log('GA Event sent (no-cors mode)');
+                  })
+                  .catch(function(error) {
+                      console.error('GA Fetch error:', error);
+                      sendViaImageBeacon(url, payload);
+                  });
+              } else {
+                  sendViaImageBeacon(url, payload);
+              }
           } catch (e) {
               console.error('GA Exception:', e);
           }
