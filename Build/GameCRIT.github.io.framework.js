@@ -9020,7 +9020,7 @@ var ASM_CONSTS = {
               };
   
               // Fixed URL with proper parameter separation
-              var url = 'https://www.google-analytics.com/mp/collect?' +
+              var url = 'https://www.google-analytics.com/debug/mp/collect?' +
                         'measurement_id=G-QV8Y03PMSE' + 
                         '&api_secret=gZZKQmZ3RXiCNRCceUypxQ';
   
