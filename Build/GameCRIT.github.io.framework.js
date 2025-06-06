@@ -8951,100 +8951,108 @@ var ASM_CONSTS = {
       }
 
   function _SendGAEvent(eventName, eventData) {
-          var sendViaImageBeacon = function(url, payload) {
+          // Immediate function to limit stack usage
+          (function() {
               try {
-                  // Encode payload as URL parameters for GET request via image
-                  var params = new URLSearchParams();
-                  params.append('client_id', payload.client_id);
+                  // Simplified string conversion
+                  var name = UTF8ToString(eventName);
+                  var dataStr = UTF8ToString(eventData);
                   
-                  // Add event data
-                  var event = payload.events[0];
-                  params.append('en', event.name); // Event name
-                  
-                  // Add custom parameters
-                  if (event.params) {
-                      Object.keys(event.params).forEach(function(key) {
-                          if (event.params[key] !== null && event.params[key] !== undefined) {
-                              params.append('ep.' + key, event.params[key].toString());
-                          }
-                      });
+                  // Basic JSON parsing with error handling
+                  var data;
+                  try {
+                      data = JSON.parse(dataStr);
+                  } catch(e) {
+                      console.error('GA JSON parse error:', e);
+                      return;
                   }
-                  
-                  // Create image element to send GET request
-                  var img = new Image();
-                  img.onload = function() {
-                      console.log('GA Event sent via image beacon');
-                  };
-                  img.onerror = function() {
-                      console.log('GA Image beacon completed (error expected)');
-                  };
-                  
-                  // Use GET request with parameters
-                  var getUrl = url + '&' + params.toString();
-                  img.src = getUrl;
-                  
-              } catch (e) {
-                  console.error('Image beacon fallback failed:', e);
-              }
-          };
   
-          try {
-              // Convert Unity strings to JavaScript strings
-              var name = UTF8ToString(eventName);
-              var data = JSON.parse(UTF8ToString(eventData));
-              
-              console.log('Sending GA Event:', name, data);
-              
-              // Get or create client ID with fallback for restricted localStorage
-              var clientId;
-              try {
-                  clientId = localStorage.getItem('ga_client_id');
-                  if (!clientId) {
-                      clientId = Math.random().toString(36).substring(2) + 
-                                Date.now().toString(36);
-                      localStorage.setItem('ga_client_id', clientId);
+                  // Client ID with fallback for Safari private mode
+                  var clientId;
+                  try {
+                      clientId = localStorage.getItem('ga_client_id') || 
+                                (function() {
+                                    var newId = Math.random().toString(36).substring(2, 15) +
+                                               Math.random().toString(36).substring(2, 15);
+                                    try {
+                                        localStorage.setItem('ga_client_id', newId);
+                                    } catch(e) {
+                                        // Safari private mode fallback
+                                    }
+                                    return newId;
+                                })();
+                  } catch(e) {
+                      clientId = 'safari-' + Math.random().toString(36).substring(2, 15);
                   }
-              } catch (e) {
-                  console.warn('localStorage unavailable, using session-based client ID');
-                  clientId = window.tempClientId || (window.tempClientId = 
-                      Math.random().toString(36).substring(2) + Date.now().toString(36));
+  
+                  // Simplified payload structure
+                  var payload = {
+                      client_id: clientId,
+                      events: [{
+                          name: name,
+                          params: data.data || data
+                      }]
+                  };
+  
+                  // URL construction with proper encoding
+                  var url = 'https://www.google-analytics.com/mp/collect?' +
+                           'measurement_id=G-QV8Y03PMSE' + 
+                           '&api_secret=gZZKQmZ3RXiCNRCceUypxQ';
+  
+                  // Safari-optimized XHR implementation
+                  try {
+                      var xhr = new XMLHttpRequest();
+                      xhr.open('POST', url, true);
+                      xhr.setRequestHeader('Content-Type', 'application/json');
+                      
+                      // Safari-specific optimizations
+                      xhr.timeout = 2000; // 2 second timeout
+                      xhr.ontimeout = function() {
+                          console.log('GA XHR timeout - using fallback');
+                          sendImageBeacon(url, payload);
+                      };
+                      
+                      xhr.onerror = function() {
+                          console.log('GA XHR error - using fallback');
+                          sendImageBeacon(url, payload);
+                      };
+                      
+                      xhr.send(JSON.stringify(payload));
+                  } catch(xhrError) {
+                      console.error('GA XHR failed:', xhrError);
+                      sendImageBeacon(url, payload);
+                  }
+  
+                  // Image beacon fallback (Safari-compatible)
+                  function sendImageBeacon(url, payload) {
+                      try {
+                          var params = new URLSearchParams();
+                          params.append('client_id', payload.client_id);
+                          params.append('en', payload.events[0].name);
+                          
+                          // Flatten parameters
+                          var eventParams = payload.events[0].params || {};
+                          Object.keys(eventParams).forEach(function(key) {
+                              if (eventParams[key] != null) {
+                                  params.append('ep.' + key, 
+                                      typeof eventParams[key] === 'object' ? 
+                                      JSON.stringify(eventParams[key]) : 
+                                      eventParams[key].toString());
+                              }
+                          });
+                          
+                          // Create and send image
+                          var img = new Image();
+                          img.src = url.replace('/mp/collect', '/g/collect') + 
+                                    '&' + params.toString();
+                      } catch(beaconError) {
+                          console.error('GA Beacon failed:', beaconError);
+                      }
+                  }
+              } catch(mainError) {
+                  console.error('GA Main error:', mainError);
               }
-  
-              // Create the payload
-              var payload = {
-                  client_id: clientId,
-                  events: [{
-                      name: name,
-                      params: data.data || data
-                  }]
-              };
-  
-              // Fixed URL with proper parameter separation
-              var url = 'https://www.google-analytics.com/debug/mp/collect?' +
-                        'measurement_id=G-QV8Y03PMSE' + 
-                        '&api_secret=gZZKQmZ3RXiCNRCceUypxQ';
-  
-              // Use fetch API with no-cors mode (avoids preflight entirely)
-              if (window.fetch) {
-                  fetch(url, {
-                      method: 'POST',
-                      body: JSON.stringify(payload),
-                      mode: 'no-cors',
-                      keepalive: true
-                  })
-                  .then(function(response) {
-                      console.log('GA Event sent (no-cors mode)');
-                  })
-                  .catch(function(error) {
-                      console.error('GA Fetch error:', error);
-                      sendViaImageBeacon(url, payload);
-                  });
-              } else {
-                  sendViaImageBeacon(url, payload);
-              }
-          } catch (e) {
-              console.error('GA Exception:', e);
-          }
+          })();
       }
 
   function _SetDocument(collectionPath, documentId, value, objectName, callback, fallback) {
