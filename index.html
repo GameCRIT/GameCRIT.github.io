@@ -135,19 +135,21 @@ function updateIframe(url) {
         updateBannerVisibility();
       }
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
-      var config = {
-        arguments: [],
-        dataUrl: buildUrl + "/GameCRIT.github.io.data.br",
-        frameworkUrl: buildUrl + "/GameCRIT.github.io.framework.js.br",
-        codeUrl: buildUrl + "/GameCRIT.github.io.wasm.br",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "Gamecrit",
-        productVersion: "1.0",
-        showBanner: unityShowBanner,
-      };
+var buildUrl = "Build";
+var loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";  // uncompressed loader
+
+var config = {
+  arguments: [],
+  dataUrl: buildUrl + "/GameCRIT.github.io.data.br",             // Brotli compressed
+  frameworkUrl: buildUrl + "/GameCRIT.github.io.framework.js.br", // Brotli compressed
+  codeUrl: buildUrl + "/GameCRIT.github.io.wasm.br",             // Brotli compressed
+  streamingAssetsUrl: "StreamingAssets",
+  companyName: "DefaultCompany",
+  productName: "Gamecrit",
+  productVersion: "1.0",
+  showBanner: unityShowBanner,
+};
+
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');

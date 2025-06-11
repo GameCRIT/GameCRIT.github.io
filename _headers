@@ -3,7 +3,7 @@
   Content-Type: application/wasm
   Cache-Control: public, max-age=31536000
 
-/Build/*.js.br
+/Build/*.framework.js.br
   Content-Encoding: br
   Content-Type: application/javascript
   Cache-Control: public, max-age=31536000
@@ -11,9 +11,4 @@
 /Build/*.data.br
   Content-Encoding: br
   Content-Type: application/octet-stream
-  Cache-Control: public, max-age=31536000
-
-/Build/*.framework.js.br
-  Content-Encoding: br
-  Content-Type: application/javascript
   Cache-Control: public, max-age=31536000
