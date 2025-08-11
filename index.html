@@ -7,167 +7,217 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <style>
-      #videoContainer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: none;
-        z-index: 10;
-      }
-      #videoFrame {
-        width: 100%;
-        height: 100%;
-      }
-      #closeButton {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 11;
-        background-color: red;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-      }
-      #loadingOverlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 12;
-      }
-      .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
+        /* Background styling */
+        body {
+            background-image: url('Images/bg.png');
+            background-repeat: repeat;
+            background-size: 500px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Unity container styling with outline */
+        #unity-container {
+            border: 2px solid white;
+            border-radius: 8px;
+            overflow: visible;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            width: fit-content;
+        }
+
+        /* Simplified controls bar with left-center-right layout */
+        #unity-build-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            border-top: 1px solid #444;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            margin: 0;
+            margin-top: -2px;
+            border: 2px solid white;
+            border-top: 1px solid #444;
+        }
+
+        /* Added app name styling in center */
+        #app-name {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Fullscreen button with icon */
+        #unity-fullscreen-button {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        #unity-fullscreen-button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        #videoContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 10;
+        }
+
+        #videoFrame {
+            width: 100%;
+            height: 100%;
+        }
+
+        #closeButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 11;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #loadingOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 12;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- Added proper wrapper class for centering -->
-    <div class="main-wrapper">
-        <div id="unity-container" class="unity-desktop">
-            <canvas id="unity-canvas" width="100%" height="100%" tabindex="-1"></canvas>
-            <div id="unity-loading-bar">
-                <div id="unity-logo"></div>
-                <div id="unity-progress-bar-empty">
-                    <div id="unity-progress-bar-full"></div>
-                </div>
+    <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas" width=100% height=100% tabindex="-1"></canvas>
+        <div id="unity-loading-bar">
+            <div id="unity-logo"></div>
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
             </div>
-            <!-- Restructured controls with left, center, right layout -->
-            <div id="unity-controls">
-                <div class="button-left">
-                    <!-- Replaced text with icon image -->
-                    <button id="unity-fullscreen-button" class="unity-button">
-                        <img src="TemplateData/fullscreen-button.png" alt="Fullscreen">
-                    </button>
-                </div>
-                <div id="app-name">Gamecrit</div>
-                <div class="button-right">
-                    <!-- Unload button will be added here by JavaScript -->
-                </div>
-            </div>
-            <div id="unity-warning"></div>
         </div>
+         Restructured with left-center-right layout 
+        <div id="unity-build-title">
+            <button id="unity-fullscreen-button">
+                <img src="TemplateData/fullscreen-button.png" alt="Fullscreen">
+            </button>
+            <div id="app-name">Gamecrit</div>
+            <div id="quit-container">
+                 Unload button will be added here 
+            </div>
+        </div>
+        <div id="unity-warning"> </div>
     </div>
 
-    <!-- Video overlay -->
-    <div id="video-overlay">
-        <div id="video-container">
-            <button id="close-video" onclick="closeVideo()">✕ Close</button>
-            <iframe id="video-frame" src="about:blank"></iframe>
-        </div>
+    <div id="videoContainer">
+        <button id="closeButton" onclick="closeVideo()">Close</button>
+        <iframe id="videoFrame" width="100%" height="100%" src="about:blank"></iframe>
     </div>
 
-    <!-- Loading overlay -->
-    <div id="loading-overlay">
+    <div id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
 
     <script>
         let unityInstance = null;
-        let isUnityLoaded = false;
 
-        // Video functionality
         function updateIframe(url) {
-            console.log("Loading video:", url);
-            
-            // Convert YouTube links to embed format
+            console.log("Raw input URL:", url);
+            // Convert standard YouTube links to embed links
             const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
             if (ytMatch) {
                 const videoId = ytMatch[1];
                 url = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
             }
 
-            document.getElementById("loading-overlay").style.display = 'flex';
-            
-            if (unityInstance && isUnityLoaded && typeof unityInstance.SetFullscreen === 'function') {
-                try {
-                    unityInstance.SetFullscreen(0);
-                } catch (e) {
-                    console.warn("Could not exit fullscreen:", e);
-                }
+            document.getElementById("loadingOverlay").style.display = 'flex';
+
+            if (unityInstance && unityInstance.SetFullscreen) {
+                unityInstance.SetFullscreen(0);
             }
 
-            const iframe = document.getElementById("video-frame");
+            const iframe = document.getElementById("videoFrame");
             iframe.src = url;
             iframe.onload = () => {
-                document.getElementById("loading-overlay").style.display = 'none';
-                document.getElementById("video-overlay").style.display = 'flex';
+                document.getElementById("loadingOverlay").style.display = 'none';
+                document.getElementById("videoContainer").style.display = 'block';
             };
         }
 
         function closeVideo() {
-            if (confirm("Are you sure you want to close the video?")) {
-                const iframe = document.getElementById("video-frame");
+            const confirmClose = confirm("Are you sure you want to close the video?");
+            if (confirmClose) {
+                const iframe = document.getElementById("videoFrame");
                 iframe.src = "about:blank";
-                document.getElementById("video-overlay").style.display = 'none';
-                document.getElementById("loading-overlay").style.display = 'none';
+                document.getElementById("videoContainer").style.display = 'none';
+                document.getElementById("loadingOverlay").style.display = 'none';
                 iframe.onload = null;
             }
         }
 
-        // Unity banner messages
+        var canvas = document.querySelector("#unity-canvas");
+
         function unityShowBanner(msg, type) {
-            const warningBanner = document.querySelector("#unity-warning");
-            const div = document.createElement('div');
+            var warningBanner = document.querySelector("#unity-warning");
+            function updateBannerVisibility() {
+                warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+            }
+            var div = document.createElement('div');
             div.innerHTML = msg;
             warningBanner.appendChild(div);
-
-            if (type === 'error') {
-                div.style = 'background: red; padding: 10px; color: white; margin: 5px 0; border-radius: 4px;';
-            } else if (type === 'warning') {
-                div.style = 'background: orange; padding: 10px; color: white; margin: 5px 0; border-radius: 4px;';
-                setTimeout(() => {
-                    if (warningBanner.contains(div)) {
-                        warningBanner.removeChild(div);
-                    }
+            if (type == 'error') div.style = 'background: red; padding: 10px;';
+            else {
+                if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+                setTimeout(function() {
+                    warningBanner.removeChild(div);
+                    updateBannerVisibility();
                 }, 5000);
             }
-
-            warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+            updateBannerVisibility();
         }
 
-        // Unity configuration
-        const canvas = document.querySelector("#unity-canvas");
-        const buildUrl = "Build";
-        const loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
-
-        const config = {
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
+        var config = {
             arguments: [],
             dataUrl: buildUrl + "/GameCRIT.github.io.data.br",
             frameworkUrl: buildUrl + "/GameCRIT.github.io.framework.js.br",
@@ -179,9 +229,8 @@
             showBanner: unityShowBanner,
         };
 
-        // Mobile detection and setup
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            const meta = document.createElement('meta');
+            var meta = document.createElement('meta');
             meta.name = 'viewport';
             meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
             document.getElementsByTagName('head')[0].appendChild(meta);
@@ -192,40 +241,50 @@
             canvas.style.height = "600px";
         }
 
-        // Load Unity
         document.querySelector("#unity-loading-bar").style.display = "block";
 
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-        }).then((instance) => {
-          unityInstance = instance;
-          document.querySelector("#unity-loading-bar").style.display = "none";
-          const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
-          if (fullscreenBtn) {
-            fullscreenBtn.onclick = () => {
-              unityInstance.SetFullscreen(1);
-            };
-          }
-          var quit = document.createElement("button");
-          quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
-          quit.innerHTML = "Unload";
-          document.querySelector("#unity-build-title").appendChild(quit);
-          quit.onclick = () => {
-            unityInstance.Quit().then(() => {
-              document.querySelector("#unity-container").remove();
-              canvas = null;
-              script.remove();
-              script = null;
-            });
-          };
-        }).catch((message) => {
-          alert(message);
-        });
-      };
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+            }).then((instance) => {
+                unityInstance = instance;
+                document.querySelector("#unity-loading-bar").style.display = "none";
 
+                const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
+                if (fullscreenBtn) {
+                    fullscreenBtn.onclick = () => {
+                        unityInstance.SetFullscreen(1);
+                    };
+                }
+
+                var quit = document.createElement("button");
+                quit.style = "background-color: #f44336; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 5px; font-size: 13px; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);";
+                quit.innerHTML = "Unload";
+                quit.onmouseover = function() { 
+                    this.style.backgroundColor = "#da190b"; 
+                    this.style.transform = "translateY(-1px)";
+                    this.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.3)";
+                };
+                quit.onmouseout = function() { 
+                    this.style.backgroundColor = "#f44336"; 
+                    this.style.transform = "translateY(0)";
+                    this.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+                };
+                document.querySelector("#quit-container").appendChild(quit);
+                quit.onclick = () => {
+                    unityInstance.Quit().then(() => {
+                        document.querySelector("#unity-container").remove();
+                        canvas = null;
+                        script.remove();
+                        script = null;
+                    });
+                };
+            }).catch((message) => {
+                alert(message);
+            });
+        };
         document.body.appendChild(script);
     </script>
 </body>
