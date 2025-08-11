@@ -169,8 +169,9 @@
                 url = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
             }
 
-            document.getElementById("loadingOverlay").style.display = 'flex';
-
+            document.getElementById("loading-overlay").style.display = 'flex';
+            
+            // Exit fullscreen if active
             if (unityInstance && unityInstance.SetFullscreen) {
                 unityInstance.SetFullscreen(0);
             }
@@ -259,32 +260,27 @@
                     };
                 }
 
-                var quit = document.createElement("button");
-                quit.style = "background-color: #f44336; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 5px; font-size: 13px; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);";
-                quit.innerHTML = "Unload";
-                quit.onmouseover = function() { 
-                    this.style.backgroundColor = "#da190b"; 
-                    this.style.transform = "translateY(-1px)";
-                    this.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.3)";
+                // Create and setup unload button
+                const quitBtn = document.createElement("button");
+                quitBtn.id = "unity-quit-button";
+                quitBtn.className = "unity-button";
+                quitBtn.innerHTML = "Unload";
+                quitBtn.onclick = () => {
+                    if (confirm("Are you sure you want to unload the game?")) {
+                        unityInstance.Quit().then(() => {
+                            document.querySelector("#unity-container").remove();
+                            script.remove();
+                        });
+                    }
                 };
-                quit.onmouseout = function() { 
-                    this.style.backgroundColor = "#f44336"; 
-                    this.style.transform = "translateY(0)";
-                    this.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
-                };
-                document.querySelector("#quit-container").appendChild(quit);
-                quit.onclick = () => {
-                    unityInstance.Quit().then(() => {
-                        document.querySelector("#unity-container").remove();
-                        canvas = null;
-                        script.remove();
-                        script = null;
-                    });
-                };
+
+                document.querySelector("#unity-controls .button-right").appendChild(quitBtn);
+
             }).catch((message) => {
-                alert(message);
+                alert("Failed to load Unity: " + message);
             });
         };
+
         document.body.appendChild(script);
     </script>
 </body>
