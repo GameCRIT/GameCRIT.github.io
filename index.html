@@ -14,16 +14,22 @@
         background-size: 500px; /* Smaller size for finer pattern */
         margin: 0;
         padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
       }
       
       /* Unity container styling with outline */
       #unity-container {
         border: 2px solid white;
         border-radius: 8px;
-        overflow: hidden;
+        overflow: visible;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
         position: relative;
+        width: fit-content;
       }
       
       /* Unity buttons container styling - taskbar/navbar */
@@ -35,13 +41,14 @@
         padding: 10px 15px;
         background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
         border-top: 1px solid #444;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
         position: relative;
         margin: 0;
-        width: 100%;
-        box-sizing: border-box;
+        margin-top: -2px;
+        border: 2px solid white;
+        border-top: 1px solid #444;
       }
       
       /* Taskbar accent line */
