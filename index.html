@@ -7,199 +7,54 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <style>
-        /* Background and layout */
-        body {
-            background-image: url('Images/bg.png');
-            background-repeat: repeat;
-            background-size: 500px;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Added main wrapper styling for proper centering */
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Unity container */
-        #unity-container {
-            border: 2px solid white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-            display: flex;
-            flex-direction: column;
-            width: fit-content;
-            background: #000;
-        }
-
-        /* Redesigned control bar to spread elements across left, center, right */
-        #unity-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.8);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom-left-radius: 6px;
-            border-bottom-right-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Fixed button styling to apply to both buttons properly */
-        .unity-button,
-        #unity-fullscreen-button,
-        #unity-quit-button {
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 12px;
-            cursor: pointer;
-            border-radius: 3px;
-            font-size: 12px;
-            font-weight: normal;
-            transition: opacity 0.2s ease;
-            color: white;
-            background: transparent;
-            display: inline-block; /* Ensure buttons display properly */
-        }
-
-        /* Added specific styling for fullscreen icon button */
-        #unity-fullscreen-button {
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #unity-fullscreen-button img {
-            width: 20px;
-            height: 20px;
-            transition: opacity 0.2s ease;
-        }
-
-        #unity-fullscreen-button:hover img {
-            opacity: 0.8;
-        }
-
-        /* Unified hover effects for both buttons */
-        .unity-button:hover,
-        #unity-quit-button:hover {
-            opacity: 0.8;
-        }
-
-        /* App name moved to toolbar center */
-        #app-name {
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            margin: 0;
-        }
-
-        /* Button containers for left and right positioning */
-        .button-left, .button-right {
-            min-width: 80px;
-        }
-
-        .button-left {
-            text-align: left;
-        }
-
-        .button-right {
-            text-align: right;
-        }
-
-        /* Video overlay */
-        #video-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        #video-container {
-            position: relative;
-            width: 90%;
-            height: 90%;
-            max-width: 1200px;
-            max-height: 800px;
-        }
-
-        #video-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 8px;
-        }
-
-        #close-video {
-            position: absolute;
-            top: -40px;
-            right: 0;
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        #close-video:hover {
-            background: #da190b;
-        }
-
-        /* Loading spinner */
-        #loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            #unity-container {
-                margin: 10px;
-            }
-            
-            #video-container {
-                width: 95%;
-                height: 95%;
-            }
-        }
+      #videoContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        z-index: 10;
+      }
+      #videoFrame {
+        width: 100%;
+        height: 100%;
+      }
+      #closeButton {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 11;
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      #loadingOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 12;
+      }
+      .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     </style>
 </head>
 <body>
@@ -340,77 +195,36 @@
         // Load Unity
         document.querySelector("#unity-loading-bar").style.display = "block";
 
-        const script = document.createElement("script");
-        script.src = loaderUrl;
-        script.onload = () => {
-            createUnityInstance(canvas, config, (progress) => {
-                document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-            }).then((instance) => {
-                unityInstance = instance;
-                isUnityLoaded = true; // Added flag to track Unity load state
-                document.querySelector("#unity-loading-bar").style.display = "none";
-
-                // Setup fullscreen button
-                const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
-                if (fullscreenBtn) {
-                    fullscreenBtn.onclick = () => {
-                        if (unityInstance && isUnityLoaded && typeof unityInstance.SetFullscreen === 'function') {
-                            try {
-                                unityInstance.SetFullscreen(1);
-                            } catch (e) {
-                                console.error("Fullscreen error:", e);
-                            }
-                        }
-                    };
-                }
-
-                // Create and setup unload button
-                const quitBtn = document.createElement("button");
-                quitBtn.id = "unity-quit-button";
-                quitBtn.className = "unity-button";
-                quitBtn.innerHTML = "Unload";
-                quitBtn.onclick = () => {
-                    if (confirm("Are you sure you want to unload the game?")) {
-                        if (unityInstance && isUnityLoaded && typeof unityInstance.Quit === 'function') {
-                            try {
-                                isUnityLoaded = false; // Mark as unloading
-                                unityInstance.Quit().then(() => {
-                                    // Clean up DOM elements after Unity has properly quit
-                                    setTimeout(() => {
-                                        const container = document.querySelector("#unity-container");
-                                        if (container) {
-                                            container.remove();
-                                        }
-                                        if (script && script.parentNode) {
-                                            script.remove();
-                                        }
-                                        unityInstance = null;
-                                    }, 100);
-                                }).catch((e) => {
-                                    console.error("Error during Unity quit:", e);
-                                    isUnityLoaded = false;
-                                });
-                            } catch (e) {
-                                console.error("Quit error:", e);
-                                isUnityLoaded = false;
-                            }
-                        }
-                    }
-                };
-
-                document.querySelector("#unity-controls .button-right").appendChild(quitBtn);
-
-            }).catch((message) => {
-                console.error("Unity load error:", message);
-                alert("Failed to load Unity: " + message);
-                isUnityLoaded = false;
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+        }).then((instance) => {
+          unityInstance = instance;
+          document.querySelector("#unity-loading-bar").style.display = "none";
+          const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
+          if (fullscreenBtn) {
+            fullscreenBtn.onclick = () => {
+              unityInstance.SetFullscreen(1);
+            };
+          }
+          var quit = document.createElement("button");
+          quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
+          quit.innerHTML = "Unload";
+          document.querySelector("#unity-build-title").appendChild(quit);
+          quit.onclick = () => {
+            unityInstance.Quit().then(() => {
+              document.querySelector("#unity-container").remove();
+              canvas = null;
+              script.remove();
+              script = null;
             });
-        };
-
-        script.onerror = () => {
-            console.error("Failed to load Unity loader script");
-            alert("Failed to load Unity loader. Please check if all files are present.");
-        };
+          };
+        }).catch((message) => {
+          alert(message);
+        });
+      };
 
         document.body.appendChild(script);
     </script>
