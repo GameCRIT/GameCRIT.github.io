@@ -39,66 +39,40 @@
             background: #000;
         }
 
-        /* Fixed control bar to be more compact */
+        /* Simplified control bar to be minimalistic */
         #unity-controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             justify-content: center;
-            padding: 8px 12px;
-            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
-            border-top: 1px solid #444;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
-            position: relative;
             width: fit-content;
             margin: 0 auto;
         }
 
-        /* Accent line */
-        #unity-controls::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, #4CAF50, #2196F3);
-            border-radius: 0 0 3px 3px;
-        }
-
         /* Buttons */
         .unity-button {
-            border: none;
-            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
             cursor: pointer;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: normal;
+            transition: opacity 0.2s ease;
             color: white;
-        }
-
-        #unity-fullscreen-button {
-            background-color: #4CAF50;
+            background: transparent;
         }
 
         #unity-fullscreen-button:hover {
-            background-color: #45a049;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        #unity-quit-button {
-            background-color: #f44336;
+            opacity: 0.8;
         }
 
         #unity-quit-button:hover {
-            background-color: #da190b;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0.8;
         }
 
         /* App name */
