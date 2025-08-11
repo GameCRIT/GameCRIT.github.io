@@ -26,24 +26,28 @@
       
       /* Unity buttons container styling */
       #unity-build-title {
+        position: absolute;
+        top: 10px;
+        right: 10px;
         display: flex;
-        gap: 10px;
+        gap: 8px;
         align-items: center;
-        justify-content: center;
-        padding: 10px;
-        flex-wrap: wrap;
-        background: rgba(0, 0, 0, 0.1);
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 8px 12px;
+        background: #2a2a2a;
+        border-radius: 6px;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       }
       
       #unity-fullscreen-button {
         background-color: #4CAF50;
         color: white;
         border: none;
-        padding: 8px 16px;
+        padding: 6px 12px;
         cursor: pointer;
         border-radius: 4px;
-        font-size: 14px;
+        font-size: 12px;
+        font-weight: 500;
       }
       
       #unity-fullscreen-button:hover {
@@ -223,7 +227,7 @@ var config = {
             };
           }
           var quit = document.createElement("button");
-          quit.style = "background-color: #f44336; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; font-size: 14px;";
+          quit.style = "background-color: #f44336; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 12px; font-weight: 500;";
           quit.innerHTML = "Unload";
           quit.onmouseover = function() { this.style.backgroundColor = "#da190b"; };
           quit.onmouseout = function() { this.style.backgroundColor = "#f44336"; };
