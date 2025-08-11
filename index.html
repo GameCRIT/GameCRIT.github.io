@@ -245,6 +245,7 @@
 
     <script>
         let unityInstance = null;
+        let isUnityLoaded = false;
 
         // Video functionality
         function updateIframe(url) {
@@ -259,9 +260,12 @@
 
             document.getElementById("loading-overlay").style.display = 'flex';
             
-            // Exit fullscreen if active
-            if (unityInstance && unityInstance.SetFullscreen) {
-                unityInstance.SetFullscreen(0);
+            if (unityInstance && isUnityLoaded && typeof unityInstance.SetFullscreen === 'function') {
+                try {
+                    unityInstance.SetFullscreen(0);
+                } catch (e) {
+                    console.warn("Could not exit fullscreen:", e);
+                }
             }
 
             const iframe = document.getElementById("video-frame");
@@ -343,13 +347,20 @@
                 document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
             }).then((instance) => {
                 unityInstance = instance;
+                isUnityLoaded = true; // Added flag to track Unity load state
                 document.querySelector("#unity-loading-bar").style.display = "none";
 
                 // Setup fullscreen button
                 const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
                 if (fullscreenBtn) {
                     fullscreenBtn.onclick = () => {
-                        unityInstance.SetFullscreen(1);
+                        if (unityInstance && isUnityLoaded && typeof unityInstance.SetFullscreen === 'function') {
+                            try {
+                                unityInstance.SetFullscreen(1);
+                            } catch (e) {
+                                console.error("Fullscreen error:", e);
+                            }
+                        }
                     };
                 }
 
@@ -360,18 +371,45 @@
                 quitBtn.innerHTML = "Unload";
                 quitBtn.onclick = () => {
                     if (confirm("Are you sure you want to unload the game?")) {
-                        unityInstance.Quit().then(() => {
-                            document.querySelector("#unity-container").remove();
-                            script.remove();
-                        });
+                        if (unityInstance && isUnityLoaded && typeof unityInstance.Quit === 'function') {
+                            try {
+                                isUnityLoaded = false; // Mark as unloading
+                                unityInstance.Quit().then(() => {
+                                    // Clean up DOM elements after Unity has properly quit
+                                    setTimeout(() => {
+                                        const container = document.querySelector("#unity-container");
+                                        if (container) {
+                                            container.remove();
+                                        }
+                                        if (script && script.parentNode) {
+                                            script.remove();
+                                        }
+                                        unityInstance = null;
+                                    }, 100);
+                                }).catch((e) => {
+                                    console.error("Error during Unity quit:", e);
+                                    isUnityLoaded = false;
+                                });
+                            } catch (e) {
+                                console.error("Quit error:", e);
+                                isUnityLoaded = false;
+                            }
+                        }
                     }
                 };
 
                 document.querySelector("#unity-controls .button-right").appendChild(quitBtn);
 
             }).catch((message) => {
+                console.error("Unity load error:", message);
                 alert("Failed to load Unity: " + message);
+                isUnityLoaded = false;
             });
+        };
+
+        script.onerror = () => {
+            console.error("Failed to load Unity loader script");
+            alert("Failed to load Unity loader. Please check if all files are present.");
         };
 
         document.body.appendChild(script);
