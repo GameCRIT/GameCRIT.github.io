@@ -69,9 +69,27 @@
             display: inline-block; /* Ensure buttons display properly */
         }
 
+        /* Added specific styling for fullscreen icon button */
+        #unity-fullscreen-button {
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #unity-fullscreen-button img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1); /* Make icon white */
+            transition: opacity 0.2s ease;
+        }
+
+        #unity-fullscreen-button:hover img {
+            opacity: 0.8;
+        }
+
         /* Unified hover effects for both buttons */
         .unity-button:hover,
-        #unity-fullscreen-button:hover,
         #unity-quit-button:hover {
             opacity: 0.8;
         }
@@ -199,7 +217,10 @@
             <!-- Restructured controls with left, center, right layout -->
             <div id="unity-controls">
                 <div class="button-left">
-                    <button id="unity-fullscreen-button" class="unity-button">Fullscreen</button>
+                    <!-- Replaced text with icon image -->
+                    <button id="unity-fullscreen-button" class="unity-button">
+                        <img src="TemplateData/fullscreen-button.png" alt="Fullscreen">
+                    </button>
                 </div>
                 <div id="app-name">Gamecrit</div>
                 <div class="button-right">
