@@ -42,10 +42,10 @@
         /* Simplified control bar to be minimalistic */
         #unity-controls {
             display: flex;
-            gap: 8px;
+            gap: 12px; /* Increased gap between buttons */
             align-items: center;
             justify-content: center;
-            padding: 6px;
+            padding: 8px 12px; /* Increased padding for better spacing */
             background: rgba(0, 0, 0, 0.8);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom-left-radius: 6px;
@@ -54,8 +54,10 @@
             margin: 0 auto;
         }
 
-        /* Buttons */
-        .unity-button {
+        /* Fixed button styling to apply to both buttons properly */
+        .unity-button,
+        #unity-fullscreen-button,
+        #unity-quit-button {
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 6px 12px;
             cursor: pointer;
@@ -65,12 +67,12 @@
             transition: opacity 0.2s ease;
             color: white;
             background: transparent;
+            display: inline-block; /* Ensure buttons display properly */
         }
 
-        #unity-fullscreen-button:hover {
-            opacity: 0.8;
-        }
-
+        /* Unified hover effects for both buttons */
+        .unity-button:hover,
+        #unity-fullscreen-button:hover,
         #unity-quit-button:hover {
             opacity: 0.8;
         }
