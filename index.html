@@ -24,34 +24,51 @@
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
       }
       
-      /* Unity buttons container styling */
+      /* Unity buttons container styling - taskbar/navbar */
       #unity-build-title {
-        position: absolute;
-        top: 10px;
-        right: 10px;
         display: flex;
-        gap: 8px;
+        gap: 10px;
         align-items: center;
-        padding: 8px 12px;
-        background: #2a2a2a;
-        border-radius: 6px;
-        z-index: 100;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        justify-content: center;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+        border-top: 1px solid #444;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+      
+      /* Taskbar accent line */
+      #unity-build-title::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #4CAF50, #2196F3);
+        border-radius: 0 0 3px 3px;
       }
       
       #unity-fullscreen-button {
         background-color: #4CAF50;
         color: white;
         border: none;
-        padding: 6px 12px;
+        padding: 8px 16px;
         cursor: pointer;
-        border-radius: 4px;
-        font-size: 12px;
+        border-radius: 5px;
+        font-size: 13px;
         font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
       
       #unity-fullscreen-button:hover {
         background-color: #45a049;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
       
       #videoContainer {
@@ -227,10 +244,18 @@ var config = {
             };
           }
           var quit = document.createElement("button");
-          quit.style = "background-color: #f44336; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 12px; font-weight: 500;";
+          quit.style = "background-color: #f44336; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 5px; font-size: 13px; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);";
           quit.innerHTML = "Unload";
-          quit.onmouseover = function() { this.style.backgroundColor = "#da190b"; };
-          quit.onmouseout = function() { this.style.backgroundColor = "#f44336"; };
+          quit.onmouseover = function() { 
+            this.style.backgroundColor = "#da190b"; 
+            this.style.transform = "translateY(-1px)";
+            this.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.3)";
+          };
+          quit.onmouseout = function() { 
+            this.style.backgroundColor = "#f44336"; 
+            this.style.transform = "translateY(0)";
+            this.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+          };
           document.querySelector("#unity-build-title").appendChild(quit);
           quit.onclick = () => {
             unityInstance.Quit().then(() => {
