@@ -19,6 +19,17 @@
             align-items: center;
             min-height: 100vh;
             font-family: Arial, sans-serif;
+            animation: moveBg 20s linear infinite;
+        }
+
+        /* Diagonal background movement animation */
+        @keyframes moveBg {
+            0% {
+                background-position: 0px 0px;
+            }
+            100% {
+                background-position: 500px 500px;
+            }
         }
 
         /* Added main wrapper styling for proper centering */
