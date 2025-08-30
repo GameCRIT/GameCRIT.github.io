@@ -440,12 +440,17 @@
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
 
-        // Ensure WebGL context is available and properly configured
+        // Enhanced WebGL context debugging and setup
         function checkAndSetupWebGL() {
             try {
+                console.log('Starting WebGL context check...');
+                
                 // Test WebGL context creation
                 const testCanvas = document.createElement('canvas');
-                const gl = testCanvas.getContext('webgl2', {
+                testCanvas.width = 300;
+                testCanvas.height = 150;
+                
+                const contextOptions = {
                     alpha: false,
                     antialias: true,
                     depth: true,
@@ -454,22 +459,37 @@
                     premultipliedAlpha: false,
                     preserveDrawingBuffer: false,
                     stencil: false
-                }) || testCanvas.getContext('webgl', {
-                    alpha: false,
-                    antialias: true,
-                    depth: true,
-                    failIfMajorPerformanceCaveat: false,
-                    powerPreference: "default",
-                    premultipliedAlpha: false,
-                    preserveDrawingBuffer: false,
-                    stencil: false
-                }) || testCanvas.getContext('experimental-webgl');
+                };
+                
+                // Try WebGL 2.0 first
+                let gl = testCanvas.getContext('webgl2', contextOptions);
+                if (gl) {
+                    console.log('WebGL 2.0 context created successfully');
+                } else {
+                    // Fallback to WebGL 1.0
+                    gl = testCanvas.getContext('webgl', contextOptions) || testCanvas.getContext('experimental-webgl', contextOptions);
+                    if (gl) {
+                        console.log('WebGL 1.0 context created successfully');
+                    }
+                }
                 
                 if (!gl) {
                     throw new Error('WebGL not supported');
                 }
                 
-                console.log('WebGL context created successfully:', gl.getParameter(gl.VERSION));
+                // Test basic WebGL functionality
+                console.log('WebGL Version:', gl.getParameter(gl.VERSION));
+                console.log('WebGL Vendor:', gl.getParameter(gl.VENDOR));
+                console.log('WebGL Renderer:', gl.getParameter(gl.RENDERER));
+                console.log('WebGL Shading Language Version:', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+                
+                // Test if we can create a simple shader (basic WebGL functionality test)
+                const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+                if (!vertexShader) {
+                    throw new Error('Failed to create vertex shader');
+                }
+                
+                console.log('WebGL context is fully functional');
                 return true;
             } catch (e) {
                 console.error('WebGL setup failed:', e);
@@ -478,17 +498,52 @@
         }
 
         if (!checkAndSetupWebGL()) {
-            unityShowBanner('WebGL is not supported in this browser.', 'error');
+            unityShowBanner('WebGL is not supported in this browser. Please enable hardware acceleration and WebGL support.', 'error');
+        } else {
+            console.log('WebGL pre-check passed, proceeding with Unity initialization...');
+        }
+
+        // Pre-initialize the canvas WebGL context to prevent GLctx undefined errors
+        try {
+            console.log('Pre-initializing Unity canvas WebGL context...');
+            const preGL = canvas.getContext('webgl2', {
+                alpha: false,
+                antialias: true,
+                depth: true,
+                stencil: false,
+                preserveDrawingBuffer: false,
+                premultipliedAlpha: false,
+                powerPreference: "default"
+            }) || canvas.getContext('webgl', {
+                alpha: false,
+                antialias: true,
+                depth: true,
+                stencil: false,
+                preserveDrawingBuffer: false,
+                premultipliedAlpha: false,
+                powerPreference: "default"
+            });
+            
+            if (preGL) {
+                console.log('Unity canvas WebGL context pre-initialized successfully');
+                // Don't do anything with it, just ensure it exists
+            } else {
+                console.warn('Failed to pre-initialize Unity canvas WebGL context');
+            }
+        } catch (e) {
+            console.warn('Canvas WebGL pre-initialization failed:', e);
         }
 
         // Configure canvas with proper WebGL context attributes
         canvas.addEventListener('webglcontextlost', function(e) {
             console.warn('WebGL context lost');
             e.preventDefault();
+            unityShowBanner('WebGL context was lost. Please refresh the page.', 'warning');
         });
 
         canvas.addEventListener('webglcontextrestored', function(e) {
             console.log('WebGL context restored');
+            unityShowBanner('WebGL context restored.', 'warning');
         });
 
         const config = {
