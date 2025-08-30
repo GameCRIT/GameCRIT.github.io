@@ -7,6 +7,25 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <style>
+      /* Rolling Background */
+      body {
+        margin: 0;
+        padding: 0;
+        background: url('Images/bg.png') repeat;
+        background-size: 200px 200px;
+        animation: scrollBackground 20s linear infinite;
+        overflow: hidden;
+      }
+      
+      @keyframes scrollBackground {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 200px 200px;
+        }
+      }
+
       #webgl-error {
         display: none;
         position: fixed;
@@ -29,6 +48,94 @@
         margin: 10px;
         border-radius: 5px;
         cursor: pointer;
+      }
+
+      /* Video iframe container */
+      #video-container {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        width: 300px;
+        height: 200px;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 10px;
+        padding: 10px;
+        display: none;
+        z-index: 999;
+      }
+
+      #video-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 5px;
+      }
+
+      #close-video {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #ff4444;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      /* Explorer helper styles */
+      #explorer-helper {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        display: none;
+        z-index: 999;
+      }
+
+      #explorer-helper button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* Help overlay */
+      #help-overlay {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 1001;
+        max-width: 250px;
+        display: none;
+      }
+
+      #help-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 12px;
       }
     </style>
   </head>
@@ -57,6 +164,42 @@
         <button onclick="showWebGLHelp()">Help</button>
         <button onclick="hideError()">Close</button>
       </div>
+    </div>
+
+    <!-- Video Helper Container -->
+    <div id="video-container">
+      <button id="close-video" onclick="closeVideo()">×</button>
+      <iframe id="video-iframe" src="" allowfullscreen></iframe>
+    </div>
+
+    <!-- Explorer Helper -->
+    <div id="explorer-helper">
+      <h4>Explorer Helper</h4>
+      <button onclick="openFileExplorer()">Open File Explorer</button>
+      <button onclick="openDownloads()">Downloads Folder</button>
+      <button onclick="openDocuments()">Documents Folder</button>
+      <button onclick="closeExplorer()">Close</button>
+    </div>
+
+    <!-- Help Toggle Button -->
+    <button id="help-toggle" onclick="toggleHelp()">?</button>
+
+    <!-- Help Overlay -->
+    <div id="help-overlay">
+      <h4>GameCRIT WebGL Helpers</h4>
+      <p><strong>Keyboard Shortcuts:</strong></p>
+      <p>• <code>Ctrl + E</code> - Toggle Explorer Helper</p>
+      <p>• <code>Ctrl + V</code> - Toggle Video (if loaded)</p>
+      <p>• <code>Escape</code> - Close all helpers</p>
+      <p>• <code>?</code> button - Toggle this help</p>
+      <br>
+      <p><strong>Features:</strong></p>
+      <p>• Rolling background animation</p>
+      <p>• Video iframe embedding</p>
+      <p>• File system helpers</p>
+      <p>• WebGL error handling</p>
+      <br>
+      <button onclick="toggleHelp()" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Close Help</button>
     </div>
 
     <script>
@@ -93,6 +236,119 @@
                       "5. Try a different browser";
         alert(helpText);
       }
+
+      // Video Helper Functions
+      function updateIframe(url) {
+        console.log("Updating iframe with URL:", url);
+        document.getElementById('video-iframe').src = url;
+        document.getElementById('video-container').style.display = 'block';
+      }
+
+      function closeVideo() {
+        document.getElementById('video-container').style.display = 'none';
+        document.getElementById('video-iframe').src = '';
+      }
+
+      // Explorer Helper Functions
+      function openFileExplorer() {
+        // For security reasons, browsers can't directly open file explorer
+        // This creates a file input dialog instead
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.webkitdirectory = true; // Allow folder selection
+        input.onchange = function(e) {
+          console.log('Selected files:', e.target.files);
+          // You can process the selected files here
+          alert('Selected ' + e.target.files.length + ' files');
+        };
+        input.click();
+      }
+
+      function openDownloads() {
+        // Open downloads folder (browser-specific)
+        try {
+          window.open('file:///C:/Users/' + (navigator.userAgent.includes('Windows') ? 
+            (process.env.USERNAME || 'Default') : 'Default') + '/Downloads/', '_blank');
+        } catch (e) {
+          alert('Cannot directly access Downloads folder due to browser security restrictions.\nTry using Ctrl+J to open downloads in Chrome or Ctrl+Shift+Y in Firefox.');
+        }
+      }
+
+      function openDocuments() {
+        // Open documents folder (browser-specific)
+        try {
+          window.open('file:///C:/Users/' + (navigator.userAgent.includes('Windows') ? 
+            (process.env.USERNAME || 'Default') : 'Default') + '/Documents/', '_blank');
+        } catch (e) {
+          alert('Cannot directly access Documents folder due to browser security restrictions.\nConsider using the File Explorer option instead.');
+        }
+      }
+
+      function closeExplorer() {
+        document.getElementById('explorer-helper').style.display = 'none';
+      }
+
+      function showExplorer() {
+        document.getElementById('explorer-helper').style.display = 'block';
+      }
+
+      function toggleHelp() {
+        var helpOverlay = document.getElementById('help-overlay');
+        var helpToggle = document.getElementById('help-toggle');
+        
+        if (helpOverlay.style.display === 'none' || helpOverlay.style.display === '') {
+          helpOverlay.style.display = 'block';
+          helpToggle.style.display = 'none';
+        } else {
+          helpOverlay.style.display = 'none';
+          helpToggle.style.display = 'block';
+        }
+      }
+
+      // Global functions for Unity to call
+      window.updateIframe = updateIframe;
+      window.showExplorer = showExplorer;
+      
+      // OpenURL function for Unity
+      window.openURL = function(url) {
+        window.open(url, '_blank');
+      };
+
+      // Keyboard shortcuts for helpers
+      document.addEventListener('keydown', function(e) {
+        // Ctrl + E = Show Explorer Helper
+        if (e.ctrlKey && e.key === 'e') {
+          e.preventDefault();
+          var explorerHelper = document.getElementById('explorer-helper');
+          if (explorerHelper.style.display === 'none' || explorerHelper.style.display === '') {
+            showExplorer();
+          } else {
+            closeExplorer();
+          }
+        }
+        
+        // Ctrl + V = Show/Hide Video Container (if has content)
+        if (e.ctrlKey && e.key === 'v') {
+          e.preventDefault();
+          var videoContainer = document.getElementById('video-container');
+          var iframe = document.getElementById('video-iframe');
+          if (iframe.src && iframe.src !== '') {
+            if (videoContainer.style.display === 'none' || videoContainer.style.display === '') {
+              videoContainer.style.display = 'block';
+            } else {
+              videoContainer.style.display = 'none';
+            }
+          }
+        }
+        
+        // Escape = Close all helpers
+        if (e.key === 'Escape') {
+          closeVideo();
+          closeExplorer();
+          hideError();
+        }
+      });
 
       // Check WebGL support before loading Unity
       if (!checkWebGLSupport()) {
