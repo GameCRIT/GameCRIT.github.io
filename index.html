@@ -283,12 +283,6 @@
             };
         }
 
-        // Note: Unity WebGL DLL Import functions are now handled by .jslib plugins:
-        // - UpdateIframeURL: handled by EmbededVideoPlugin.jslib
-        // - OpenFileDialog: handled by ImageLoader.jslib  
-        // - RegisterKeyboardHandler, etc.: handled by KeyboardInputHandler.jslib
-        // - OpenURL: handled by OpenURL.jslib
-
         function closeVideo() {
             if (confirm("Are you sure you want to close the video?")) {
                 const iframe = document.getElementById("video-frame");
@@ -325,112 +319,6 @@
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
 
-        // Enhanced WebGL context debugging and setup
-        function checkAndSetupWebGL() {
-            try {
-                console.log('Starting WebGL context check...');
-                
-                // Test WebGL context creation
-                const testCanvas = document.createElement('canvas');
-                testCanvas.width = 300;
-                testCanvas.height = 150;
-                
-                const contextOptions = {
-                    alpha: false,
-                    antialias: true,
-                    depth: true,
-                    failIfMajorPerformanceCaveat: false,
-                    powerPreference: "default",
-                    premultipliedAlpha: false,
-                    preserveDrawingBuffer: false,
-                    stencil: false
-                };
-                
-                // Try WebGL 2.0 first
-                let gl = testCanvas.getContext('webgl2', contextOptions);
-                if (gl) {
-                    console.log('WebGL 2.0 context created successfully');
-                } else {
-                    // Fallback to WebGL 1.0
-                    gl = testCanvas.getContext('webgl', contextOptions) || testCanvas.getContext('experimental-webgl', contextOptions);
-                    if (gl) {
-                        console.log('WebGL 1.0 context created successfully');
-                    }
-                }
-                
-                if (!gl) {
-                    throw new Error('WebGL not supported');
-                }
-                
-                // Test basic WebGL functionality
-                console.log('WebGL Version:', gl.getParameter(gl.VERSION));
-                console.log('WebGL Vendor:', gl.getParameter(gl.VENDOR));
-                console.log('WebGL Renderer:', gl.getParameter(gl.RENDERER));
-                console.log('WebGL Shading Language Version:', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
-                
-                // Test if we can create a simple shader (basic WebGL functionality test)
-                const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-                if (!vertexShader) {
-                    throw new Error('Failed to create vertex shader');
-                }
-                
-                console.log('WebGL context is fully functional');
-                return true;
-            } catch (e) {
-                console.error('WebGL setup failed:', e);
-                return false;
-            }
-        }
-
-        if (!checkAndSetupWebGL()) {
-            unityShowBanner('WebGL is not supported in this browser. Please enable hardware acceleration and WebGL support.', 'error');
-        } else {
-            console.log('WebGL pre-check passed, proceeding with Unity initialization...');
-        }
-
-        // Pre-initialize the canvas WebGL context to prevent GLctx undefined errors
-        try {
-            console.log('Pre-initializing Unity canvas WebGL context...');
-            const preGL = canvas.getContext('webgl2', {
-                alpha: false,
-                antialias: true,
-                depth: true,
-                stencil: false,
-                preserveDrawingBuffer: false,
-                premultipliedAlpha: false,
-                powerPreference: "default"
-            }) || canvas.getContext('webgl', {
-                alpha: false,
-                antialias: true,
-                depth: true,
-                stencil: false,
-                preserveDrawingBuffer: false,
-                premultipliedAlpha: false,
-                powerPreference: "default"
-            });
-            
-            if (preGL) {
-                console.log('Unity canvas WebGL context pre-initialized successfully');
-                // Don't do anything with it, just ensure it exists
-            } else {
-                console.warn('Failed to pre-initialize Unity canvas WebGL context');
-            }
-        } catch (e) {
-            console.warn('Canvas WebGL pre-initialization failed:', e);
-        }
-
-        // Configure canvas with proper WebGL context attributes
-        canvas.addEventListener('webglcontextlost', function(e) {
-            console.warn('WebGL context lost');
-            e.preventDefault();
-            unityShowBanner('WebGL context was lost. Please refresh the page.', 'warning');
-        });
-
-        canvas.addEventListener('webglcontextrestored', function(e) {
-            console.log('WebGL context restored');
-            unityShowBanner('WebGL context restored.', 'warning');
-        });
-
         const config = {
             arguments: [],
             dataUrl: buildUrl + "/GameCRIT.github.io.data.br",
@@ -441,19 +329,6 @@
             productName: "Gamecrit",
             productVersion: "1.0",
             showBanner: unityShowBanner,
-            matchWebGLToCanvasSize: false,
-            devicePixelRatio: 1,
-            // WebGL context configuration
-            webglContextAttributes: {
-                alpha: false,
-                antialias: true,
-                depth: true,
-                failIfMajorPerformanceCaveat: false,
-                powerPreference: "default",
-                premultipliedAlpha: false,
-                preserveDrawingBuffer: false,
-                stencil: false
-            }
         };
 
         // Mobile detection and setup
@@ -478,19 +353,11 @@
             unityShowBanner('Failed to load Unity loader script. Please check if the build files are present.', 'error');
         };
         script.onload = () => {
-            // Let Unity handle WebGL context initialization with its plugins
-            console.log('Loading Unity with jslib plugins...');
-            
-            // Add additional error handling for Unity instance creation
-            try {
-                createUnityInstance(canvas, config, (progress) => {
-                    document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-                }).then((instance) => {
-                    unityInstance = instance;
-                    document.querySelector("#unity-loading-bar").style.display = "none";
-                    
-                    // Note: Keyboard handler is automatically initialized by KeyboardInputHandler.jslib plugin
-                    console.log("Unity instance loaded successfully");
+            createUnityInstance(canvas, config, (progress) => {
+                document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+            }).then((instance) => {
+                unityInstance = instance;
+                document.querySelector("#unity-loading-bar").style.display = "none";
 
                     // Setup fullscreen button
                     const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
@@ -527,11 +394,7 @@
                     }
                 });
                 
-            } catch (error) {
-                console.error("Error calling createUnityInstance:", error);
-                unityShowBanner('Critical error initializing Unity: ' + error.message, 'error');
-            }
-        };
+            } 
 
         document.body.appendChild(script);
     </script>
