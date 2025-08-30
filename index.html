@@ -283,6 +283,127 @@
             };
         }
 
+        // Unity WebGL DLL Import functions
+        function UpdateIframeURL(url) {
+            // This is the function Unity calls via DllImport
+            updateIframe(url);
+        }
+
+        function OpenFileDialog(objectName, callbackMethod) {
+            console.log("Opening file dialog for object:", objectName, "callback:", callbackMethod);
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            // Convert to base64 (remove data:image/...;base64, prefix)
+                            const base64Data = e.target.result.split(',')[1];
+                            console.log("Image loaded, calling Unity callback:", objectName, callbackMethod);
+                            
+                            // Call Unity callback method on the specified GameObject
+                            if (unityInstance) {
+                                unityInstance.SendMessage(objectName, callbackMethod, base64Data);
+                            }
+                        } catch (error) {
+                            console.error("Error processing image:", error);
+                        } finally {
+                            document.body.removeChild(input);
+                        }
+                    };
+                    reader.onerror = function() {
+                        console.error("Failed to read file");
+                        document.body.removeChild(input);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    console.log("No valid image file selected");
+                    document.body.removeChild(input);
+                }
+            };
+            
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        function OpenURL(url) {
+            console.log("Opening URL:", url);
+            window.open(url, '_blank');
+        }
+
+        // Keyboard handler state
+        let keyboardState = {
+            ctrlPressed: false,
+            cPressed: false,
+            vPressed: false,
+            copyRequested: false,
+            pasteRequested: false
+        };
+
+        function RegisterKeyboardHandler() {
+            console.log("Registering WebGL keyboard handler");
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Control') {
+                    keyboardState.ctrlPressed = true;
+                }
+                if (event.key === 'c' || event.key === 'C') {
+                    keyboardState.cPressed = true;
+                    if (keyboardState.ctrlPressed) {
+                        keyboardState.copyRequested = true;
+                    }
+                }
+                if (event.key === 'v' || event.key === 'V') {
+                    keyboardState.vPressed = true;
+                    if (keyboardState.ctrlPressed) {
+                        keyboardState.pasteRequested = true;
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', function(event) {
+                if (event.key === 'Control') {
+                    keyboardState.ctrlPressed = false;
+                }
+                if (event.key === 'c' || event.key === 'C') {
+                    keyboardState.cPressed = false;
+                }
+                if (event.key === 'v' || event.key === 'V') {
+                    keyboardState.vPressed = false;
+                }
+            });
+        }
+
+        function IsCtrlPressed() {
+            return keyboardState.ctrlPressed;
+        }
+
+        function IsCPressed() {
+            return keyboardState.cPressed;
+        }
+
+        function IsVPressed() {
+            return keyboardState.vPressed;
+        }
+
+        function CheckAndConsumeCopyRequest() {
+            const result = keyboardState.copyRequested;
+            keyboardState.copyRequested = false;
+            return result;
+        }
+
+        function CheckAndConsumePasteRequest() {
+            const result = keyboardState.pasteRequested;
+            keyboardState.pasteRequested = false;
+            return result;
+        }
+
         function closeVideo() {
             if (confirm("Are you sure you want to close the video?")) {
                 const iframe = document.getElementById("video-frame");
@@ -319,6 +440,25 @@
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
 
+        // Ensure WebGL context is available
+        function checkWebGLSupport() {
+            try {
+                const testCanvas = document.createElement('canvas');
+                const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+                if (!gl) {
+                    throw new Error('WebGL not supported');
+                }
+                return true;
+            } catch (e) {
+                console.error('WebGL support check failed:', e);
+                return false;
+            }
+        }
+
+        if (!checkWebGLSupport()) {
+            unityShowBanner('WebGL is not supported in this browser.', 'error');
+        }
+
         const config = {
             arguments: [],
             dataUrl: buildUrl + "/GameCRIT.github.io.data.br",
@@ -329,6 +469,8 @@
             productName: "Gamecrit",
             productVersion: "1.0",
             showBanner: unityShowBanner,
+            matchWebGLToCanvasSize: false, // Prevent automatic canvas resizing that can break context
+            devicePixelRatio: 1, // Fix pixel ratio to prevent context issues
         };
 
         // Mobile detection and setup
@@ -355,6 +497,10 @@
             }).then((instance) => {
                 unityInstance = instance;
                 document.querySelector("#unity-loading-bar").style.display = "none";
+                
+                // Initialize keyboard handler after Unity is loaded
+                RegisterKeyboardHandler();
+                console.log("Unity instance loaded and keyboard handler registered");
 
                 // Setup fullscreen button
                 const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
