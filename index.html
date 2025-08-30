@@ -440,24 +440,56 @@
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
 
-        // Ensure WebGL context is available
-        function checkWebGLSupport() {
+        // Ensure WebGL context is available and properly configured
+        function checkAndSetupWebGL() {
             try {
+                // Test WebGL context creation
                 const testCanvas = document.createElement('canvas');
-                const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+                const gl = testCanvas.getContext('webgl2', {
+                    alpha: false,
+                    antialias: true,
+                    depth: true,
+                    failIfMajorPerformanceCaveat: false,
+                    powerPreference: "default",
+                    premultipliedAlpha: false,
+                    preserveDrawingBuffer: false,
+                    stencil: false
+                }) || testCanvas.getContext('webgl', {
+                    alpha: false,
+                    antialias: true,
+                    depth: true,
+                    failIfMajorPerformanceCaveat: false,
+                    powerPreference: "default",
+                    premultipliedAlpha: false,
+                    preserveDrawingBuffer: false,
+                    stencil: false
+                }) || testCanvas.getContext('experimental-webgl');
+                
                 if (!gl) {
                     throw new Error('WebGL not supported');
                 }
+                
+                console.log('WebGL context created successfully:', gl.getParameter(gl.VERSION));
                 return true;
             } catch (e) {
-                console.error('WebGL support check failed:', e);
+                console.error('WebGL setup failed:', e);
                 return false;
             }
         }
 
-        if (!checkWebGLSupport()) {
+        if (!checkAndSetupWebGL()) {
             unityShowBanner('WebGL is not supported in this browser.', 'error');
         }
+
+        // Configure canvas with proper WebGL context attributes
+        canvas.addEventListener('webglcontextlost', function(e) {
+            console.warn('WebGL context lost');
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('webglcontextrestored', function(e) {
+            console.log('WebGL context restored');
+        });
 
         const config = {
             arguments: [],
@@ -469,8 +501,19 @@
             productName: "Gamecrit",
             productVersion: "1.0",
             showBanner: unityShowBanner,
-            matchWebGLToCanvasSize: false, // Prevent automatic canvas resizing that can break context
-            devicePixelRatio: 1, // Fix pixel ratio to prevent context issues
+            matchWebGLToCanvasSize: false,
+            devicePixelRatio: 1,
+            // WebGL context configuration
+            webglContextAttributes: {
+                alpha: false,
+                antialias: true,
+                depth: true,
+                failIfMajorPerformanceCaveat: false,
+                powerPreference: "default",
+                premultipliedAlpha: false,
+                preserveDrawingBuffer: false,
+                stencil: false
+            }
         };
 
         // Mobile detection and setup
@@ -491,44 +534,60 @@
 
         const script = document.createElement("script");
         script.src = loaderUrl;
+        script.onerror = () => {
+            unityShowBanner('Failed to load Unity loader script. Please check if the build files are present.', 'error');
+        };
         script.onload = () => {
-            createUnityInstance(canvas, config, (progress) => {
-                document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-            }).then((instance) => {
-                unityInstance = instance;
-                document.querySelector("#unity-loading-bar").style.display = "none";
-                
-                // Initialize keyboard handler after Unity is loaded
-                RegisterKeyboardHandler();
-                console.log("Unity instance loaded and keyboard handler registered");
+            // Add additional error handling for Unity instance creation
+            try {
+                createUnityInstance(canvas, config, (progress) => {
+                    document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+                }).then((instance) => {
+                    unityInstance = instance;
+                    document.querySelector("#unity-loading-bar").style.display = "none";
+                    
+                    // Initialize keyboard handler after Unity is loaded
+                    RegisterKeyboardHandler();
+                    console.log("Unity instance loaded and keyboard handler registered");
 
-                // Setup fullscreen button
-                const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
-                if (fullscreenBtn) {
-                    fullscreenBtn.onclick = () => {
-                        unityInstance.SetFullscreen(1);
-                    };
-                }
-
-                // Create and setup unload button
-                const quitBtn = document.createElement("button");
-                quitBtn.id = "unity-quit-button";
-                quitBtn.className = "unity-button";
-                quitBtn.innerHTML = "Unload";
-                quitBtn.onclick = () => {
-                    if (confirm("Are you sure you want to unload the game?")) {
-                        unityInstance.Quit().then(() => {
-                            document.querySelector("#unity-container").remove();
-                            script.remove();
-                        });
+                    // Setup fullscreen button
+                    const fullscreenBtn = document.querySelector("#unity-fullscreen-button");
+                    if (fullscreenBtn) {
+                        fullscreenBtn.onclick = () => {
+                            unityInstance.SetFullscreen(1);
+                        };
                     }
-                };
 
-                document.querySelector("#unity-controls .button-right").appendChild(quitBtn);
+                    // Create and setup unload button
+                    const quitBtn = document.createElement("button");
+                    quitBtn.id = "unity-quit-button";
+                    quitBtn.className = "unity-button";
+                    quitBtn.innerHTML = "Unload";
+                    quitBtn.onclick = () => {
+                        if (confirm("Are you sure you want to unload the game?")) {
+                            unityInstance.Quit().then(() => {
+                                document.querySelector("#unity-container").remove();
+                                script.remove();
+                            });
+                        }
+                    };
 
-            }).catch((message) => {
-                alert("Failed to load Unity: " + message);
-            });
+                    document.querySelector("#unity-controls .button-right").appendChild(quitBtn);
+                    
+                }).catch((error) => {
+                    console.error("Unity instance creation failed:", error);
+                    unityShowBanner('Failed to create Unity instance: ' + error.message, 'error');
+                    
+                    // Try to provide more specific error information
+                    if (error.message.includes('GLctx')) {
+                        unityShowBanner('WebGL context error detected. This may be due to:<br/>1. Outdated browser<br/>2. WebGL disabled<br/>3. Hardware acceleration disabled<br/>4. Incompatible graphics drivers', 'error');
+                    }
+                });
+                
+            } catch (error) {
+                console.error("Error calling createUnityInstance:", error);
+                unityShowBanner('Critical error initializing Unity: ' + error.message, 'error');
+            }
         };
 
         document.body.appendChild(script);
