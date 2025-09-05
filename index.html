@@ -189,8 +189,10 @@
       <h4>GameCRIT WebGL Helpers</h4>
       <p><strong>Keyboard Shortcuts:</strong></p>
       <p>• <code>Ctrl + E</code> - Toggle Explorer Helper</p>
-      <p>• <code>Ctrl + V</code> - Toggle Video (if loaded)</p>
+      <p>• <code>Ctrl + V</code> - Paste in input fields (normal paste)</p>
+      <p>• <code>Ctrl + Shift + V</code> - Toggle Video (if loaded)</p>
       <p>• <code>Escape</code> - Close all helpers</p>
+      <p>• <code>Right-click</code> - Context menu with paste option</p>
       <p>• <code>?</code> button - Toggle this help</p>
       <br>
       <p><strong>Features:</strong></p>
@@ -198,6 +200,8 @@
       <p>• Video iframe embedding</p>
       <p>• File system helpers</p>
       <p>• WebGL error handling</p>
+      <p>• Enhanced clipboard support</p>
+      <p>• Input field paste functionality</p>
       <br>
       <button onclick="toggleHelp()" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Close Help</button>
     </div>
@@ -315,7 +319,54 @@
         window.open(url, '_blank');
       };
 
-      // Keyboard shortcuts for helpers
+      // Clipboard functionality for WebGL
+      window.copyToClipboard = function(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(() => {
+            console.log('Text copied to clipboard');
+          }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            fallbackCopyTextToClipboard(text);
+          });
+        } else {
+          fallbackCopyTextToClipboard(text);
+        }
+      };
+
+      function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          var successful = document.execCommand('copy');
+          console.log('Fallback: Copying text command was ' + (successful ? 'successful' : 'unsuccessful'));
+        } catch (err) {
+          console.error('Fallback: Oops, unable to copy', err);
+        }
+        document.body.removeChild(textArea);
+      }
+
+      window.pasteFromClipboard = function() {
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.readText().then(text => {
+            console.log('Text pasted from clipboard:', text);
+            return text;
+          }).catch(err => {
+            console.error('Failed to read clipboard: ', err);
+            return '';
+          });
+        } else {
+          console.log('Clipboard API not available, paste may not work');
+          return Promise.resolve('');
+        }
+      };
+
+      // Keyboard shortcuts for helpers (avoiding interference with paste)
       document.addEventListener('keydown', function(e) {
         // Ctrl + E = Show Explorer Helper
         if (e.ctrlKey && e.key === 'e') {
@@ -328,8 +379,8 @@
           }
         }
         
-        // Ctrl + V = Show/Hide Video Container (if has content)
-        if (e.ctrlKey && e.key === 'v') {
+        // Ctrl + Shift + V = Show/Hide Video Container (changed to avoid conflict)
+        if (e.ctrlKey && e.shiftKey && e.key === 'V') {
           e.preventDefault();
           var videoContainer = document.getElementById('video-container');
           var iframe = document.getElementById('video-iframe');
@@ -347,6 +398,21 @@
           closeVideo();
           closeExplorer();
           hideError();
+        }
+      });
+
+      // Support Unity's paste functionality
+      document.addEventListener('paste', function(e) {
+        console.log('Paste event detected');
+        // Let Unity handle the paste naturally, just ensure it gets through
+      });
+
+      // Right-click context menu support for better paste experience
+      document.addEventListener('contextmenu', function(e) {
+        var activeElement = document.activeElement;
+        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+          // Allow context menu for input fields to enable right-click paste
+          return;
         }
       });
 
@@ -434,12 +500,50 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
-        }).catch((message) => {
+              }).then((unityInstance) => {
+        loadingBar.style.display = "none";
+        fullscreenButton.onclick = () => {
+          unityInstance.SetFullscreen(1);
+        };
+        
+        // Store unity instance globally for clipboard functions
+        window.unityInstance = unityInstance;
+        
+        // Enable input field interactions for WebGL
+        window.focusInputField = function(inputId) {
+          var input = document.getElementById(inputId);
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        };
+        
+        // Function to create temporary input for paste operations
+        window.createTempInput = function(callback) {
+          var tempInput = document.createElement('input');
+          tempInput.style.position = 'absolute';
+          tempInput.style.left = '-9999px';
+          tempInput.style.opacity = '0';
+          document.body.appendChild(tempInput);
+          tempInput.focus();
+          
+          tempInput.addEventListener('paste', function(e) {
+            var pastedText = e.clipboardData.getData('text/plain');
+            if (callback && pastedText) {
+              callback(pastedText);
+            }
+            document.body.removeChild(tempInput);
+          }, { once: true });
+          
+          // Remove temp input after 5 seconds if no paste occurred
+          setTimeout(() => {
+            if (document.body.contains(tempInput)) {
+              document.body.removeChild(tempInput);
+            }
+          }, 5000);
+        };
+        
+      }).catch((message) => {
           console.error('Unity instance creation failed:', message);
           showWebGLError('Failed to start the game: ' + message);
         });
