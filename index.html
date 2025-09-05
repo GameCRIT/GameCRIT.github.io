@@ -319,16 +319,18 @@
         window.open(url, '_blank');
       };
 
-      // Clipboard functionality for WebGL
+      // Clipboard functionality for WebGL (Unity-compatible)
       window.copyToClipboard = function(text) {
-        if (navigator.clipboard && window.isSecureContext) {
+        console.log('CopyToClipboard called from Unity with text:', text);
+        if (navigator.clipboard && (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) {
           navigator.clipboard.writeText(text).then(() => {
-            console.log('Text copied to clipboard');
+            console.log('Text copied to clipboard successfully');
           }).catch(err => {
             console.error('Failed to copy text: ', err);
             fallbackCopyTextToClipboard(text);
           });
         } else {
+          console.log('Clipboard API not available, using fallback');
           fallbackCopyTextToClipboard(text);
         }
       };
@@ -352,19 +354,76 @@
       }
 
       window.pasteFromClipboard = function() {
+        console.log('PasteFromClipboard called from Unity');
+        
         if (navigator.clipboard && window.isSecureContext) {
           return navigator.clipboard.readText().then(text => {
             console.log('Text pasted from clipboard:', text);
             return text;
           }).catch(err => {
             console.error('Failed to read clipboard: ', err);
-            return '';
+            // Fallback to temporary input method
+            return fallbackPasteFromClipboard();
           });
         } else {
-          console.log('Clipboard API not available, paste may not work');
-          return Promise.resolve('');
+          console.log('Clipboard API not available, using fallback');
+          return fallbackPasteFromClipboard();
         }
       };
+
+      function fallbackPasteFromClipboard() {
+        return new Promise((resolve) => {
+          console.log('Using fallback paste method');
+          
+          // Create a temporary input element
+          var tempInput = document.createElement('input');
+          tempInput.style.position = 'absolute';
+          tempInput.style.left = '-9999px';
+          tempInput.style.opacity = '0';
+          tempInput.style.pointerEvents = 'none';
+          document.body.appendChild(tempInput);
+          
+          // Focus the input and select all
+          tempInput.focus();
+          tempInput.select();
+          
+          // Set up paste event listener
+          var pasteHandler = function(e) {
+            var pastedText = e.clipboardData.getData('text/plain');
+            console.log('Fallback paste detected:', pastedText);
+            document.body.removeChild(tempInput);
+            resolve(pastedText || '');
+          };
+          
+          tempInput.addEventListener('paste', pasteHandler, { once: true });
+          
+          // Try to trigger paste with execCommand
+          setTimeout(() => {
+            try {
+              var success = document.execCommand('paste');
+              console.log('execCommand paste result:', success);
+              if (!success) {
+                // If execCommand fails, wait for user to paste manually
+                console.log('Waiting for manual paste...');
+                setTimeout(() => {
+                  if (document.body.contains(tempInput)) {
+                    document.body.removeChild(tempInput);
+                    resolve('');
+                  }
+                }, 3000);
+              }
+            } catch (err) {
+              console.error('execCommand paste failed:', err);
+              setTimeout(() => {
+                if (document.body.contains(tempInput)) {
+                  document.body.removeChild(tempInput);
+                  resolve('');
+                }
+              }, 3000);
+            }
+          }, 100);
+        });
+      }
 
       // Keyboard shortcuts for helpers (avoiding interference with paste)
       document.addEventListener('keydown', function(e) {
@@ -508,6 +567,38 @@
         
         // Store unity instance globally for clipboard functions
         window.unityInstance = unityInstance;
+        window.gameInstance = unityInstance; // Also store as gameInstance for jslib compatibility
+        
+        // Add Unity jslib-compatible clipboard functions
+        window.IsClipboardSupported = function() {
+          return (navigator.clipboard && navigator.clipboard.readText && 
+                  (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) ? 1 : 0;
+        };
+        
+        window.RequestClipboardTextJS = function(objectName, methodName) {
+          console.log('RequestClipboardTextJS called:', objectName, methodName);
+          
+          if (navigator.clipboard && (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) {
+            navigator.clipboard.readText().then(function(text) {
+              console.log('Clipboard text read successfully:', text);
+              if (window.gameInstance && window.gameInstance.SendMessage) {
+                window.gameInstance.SendMessage(objectName, methodName, text || "");
+              } else {
+                console.warn('gameInstance not available for SendMessage');
+              }
+            }).catch(function(err) {
+              console.error('Failed to read clipboard:', err);
+              if (window.gameInstance && window.gameInstance.SendMessage) {
+                window.gameInstance.SendMessage(objectName, methodName, "");
+              }
+            });
+          } else {
+            console.warn('Clipboard API not supported or not in secure context');
+            if (window.gameInstance && window.gameInstance.SendMessage) {
+              window.gameInstance.SendMessage(objectName, methodName, "");
+            }
+          }
+        };
         
         // Enable input field interactions for WebGL
         window.focusInputField = function(inputId) {
@@ -541,6 +632,82 @@
               document.body.removeChild(tempInput);
             }
           }, 5000);
+        };
+
+        // Unity-specific paste function that returns a string directly
+        window.GetClipboardText = function() {
+          console.log('GetClipboardText called from Unity');
+          
+          if (navigator.clipboard && window.isSecureContext) {
+            // For async clipboard API, we need to handle this differently
+            navigator.clipboard.readText().then(text => {
+              console.log('Clipboard text retrieved:', text);
+              if (window.unityInstance) {
+                try {
+                  window.unityInstance.SendMessage('ClipboardManager', 'OnClipboardTextReceived', text);
+                } catch (err) {
+                  console.log('Unity clipboard message not available');
+                }
+              }
+            }).catch(err => {
+              console.error('Failed to read clipboard:', err);
+              if (window.unityInstance) {
+                try {
+                  window.unityInstance.SendMessage('ClipboardManager', 'OnClipboardTextReceived', '');
+                } catch (err) {
+                  console.log('Unity clipboard message not available');
+                }
+              }
+            });
+            return 'ASYNC_CLIPBOARD_REQUEST'; // Indicate async operation
+          } else {
+            console.log('Clipboard API not available');
+            return '';
+          }
+        };
+
+        // Alternative synchronous paste function using user interaction
+        window.RequestPaste = function() {
+          console.log('RequestPaste called from Unity - creating temp input');
+          
+          var tempInput = document.createElement('input');
+          tempInput.style.position = 'fixed';
+          tempInput.style.top = '50%';
+          tempInput.style.left = '50%';
+          tempInput.style.transform = 'translate(-50%, -50%)';
+          tempInput.style.zIndex = '10000';
+          tempInput.style.padding = '10px';
+          tempInput.style.border = '2px solid #4CAF50';
+          tempInput.style.borderRadius = '5px';
+          tempInput.style.backgroundColor = 'white';
+          tempInput.placeholder = 'Press Ctrl+V to paste, then press Enter';
+          document.body.appendChild(tempInput);
+          tempInput.focus();
+          
+          tempInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              var text = tempInput.value;
+              console.log('Manual paste received:', text);
+              document.body.removeChild(tempInput);
+              
+              if (window.unityInstance && text) {
+                try {
+                  window.unityInstance.SendMessage('ClipboardManager', 'OnClipboardTextReceived', text);
+                } catch (err) {
+                  console.log('Unity clipboard message not available');
+                }
+              }
+            } else if (e.key === 'Escape') {
+              document.body.removeChild(tempInput);
+            }
+          });
+          
+          // Auto-remove after 10 seconds
+          setTimeout(() => {
+            if (document.body.contains(tempInput)) {
+              document.body.removeChild(tempInput);
+            }
+          }, 10000);
         };
         
       }).catch((message) => {
