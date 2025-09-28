@@ -26,7 +26,8 @@
         position: relative;
         width: 100%;
         max-width: 1200px; /* Reasonable max width for desktop */
-        height: 56.25vw; /* 16:9 aspect ratio based on viewport width */
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
         max-height: 80vh; /* Prevent container from being too tall */
         background: #000;
         display: flex;
@@ -44,7 +45,8 @@
       @media (max-width: 768px) {
         #unity-container {
           width: 100vw;
-          height: 56.25vw;
+          height: 0;
+          padding-bottom: 56.25vw;
           max-width: 100vw;
           max-height: 100vh;
         }
@@ -54,7 +56,8 @@
       @media (orientation: landscape) and (max-width: 1024px) {
         #unity-container {
           width: 100vw;
-          height: 56.25vw;
+          height: 0;
+          padding-bottom: 56.25vw;
           max-width: 177.78vh;
           max-height: calc(100vh - 20px);
         }
@@ -64,7 +67,8 @@
       @media (orientation: portrait) and (max-width: 768px) {
         #unity-container {
           width: 100vw;
-          height: 56.25vw;
+          height: 0;
+          padding-bottom: 56.25vw;
           max-width: 100vw;
           max-height: 100vh;
         }
@@ -643,13 +647,15 @@
              if (window.innerHeight > window.innerWidth) {
                // Portrait mode
                container.style.width = "100vw";
-               container.style.height = "56.25vw";
+               container.style.height = "0";
+               container.style.paddingBottom = "56.25vw";
                container.style.maxWidth = "100vw";
                container.style.maxHeight = "100vh";
              } else {
                // Landscape mode
                container.style.width = "100vw";
-               container.style.height = "56.25vw";
+               container.style.height = "0";
+               container.style.paddingBottom = "56.25vw";
                container.style.maxWidth = "177.78vh";
                container.style.maxHeight = "calc(100vh - 20px)";
              }
