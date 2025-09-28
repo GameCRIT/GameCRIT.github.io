@@ -24,16 +24,14 @@
       /* Unity Container 16:9 Aspect Ratio */
       #unity-container {
         position: relative;
-        width: 100%;
-        height: 0;
-        padding-bottom: 56.25%; /* 16:9 aspect ratio (9/16 = 0.5625) */
-        max-width: 1200px; /* Reasonable max width for desktop */
-        max-height: 80vh; /* Prevent container from being too tall */
+        width: 100vw;
+        height: 56.25vw; /* 16:9 aspect ratio (9/16 = 0.5625) */
+        max-width: 177.78vh; /* 16:9 aspect ratio (16/9 = 1.7778) */
+        max-height: 100vh;
         background: #000;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto; /* Center the container */
       }
 
       #unity-canvas {
@@ -46,11 +44,9 @@
       @media (max-width: 768px) {
         #unity-container {
           width: 100vw;
-          height: 0;
-          padding-bottom: 56.25vw;
+          height: 56.25vw;
           max-width: 100vw;
           max-height: 100vh;
-          margin: 0;
         }
       }
 
@@ -58,11 +54,10 @@
       @media (orientation: landscape) and (max-width: 1024px) {
         #unity-container {
           width: 100vw;
-          height: 0;
-          padding-bottom: 56.25vw;
+          height: 56.25vw;
           max-width: 177.78vh;
           max-height: calc(100vh - 20px); /* Small padding for bottom navigation widget */
-          margin: 0 0 20px 0;
+          margin-bottom: 20px;
         }
       }
 
@@ -70,11 +65,9 @@
       @media (orientation: portrait) and (max-width: 768px) {
         #unity-container {
           width: 100vw;
-          height: 0;
-          padding-bottom: 56.25vw;
+          height: 56.25vw;
           max-width: 100vw;
           max-height: 100vh;
-          margin: 0;
         }
       }
 
@@ -672,19 +665,17 @@
             if (window.innerHeight > window.innerWidth) {
               // Portrait mode - no extra padding needed
               container.style.width = "100vw";
-              container.style.height = "0";
-              container.style.paddingBottom = "56.25vw";
+              container.style.height = "56.25vw";
               container.style.maxWidth = "100vw";
               container.style.maxHeight = "100vh";
               container.style.margin = "0";
             } else {
               // Landscape mode - small bottom padding for navigation widget
               container.style.width = "100vw";
-              container.style.height = "0";
-              container.style.paddingBottom = "56.25vw";
+              container.style.height = "56.25vw";
               container.style.maxWidth = "177.78vh";
               container.style.maxHeight = "calc(100vh - 20px)";
-              container.style.margin = "0 0 20px 0";
+              container.style.marginBottom = "20px";
             }
             
             // Resize Unity canvas if instance exists
