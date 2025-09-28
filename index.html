@@ -57,7 +57,6 @@
           height: 56.25vw;
           max-width: 177.78vh;
           max-height: calc(100vh - 20px); /* Small padding for bottom navigation widget */
-          margin-bottom: 20px;
         }
       }
 
@@ -668,14 +667,12 @@
               container.style.height = "56.25vw";
               container.style.maxWidth = "100vw";
               container.style.maxHeight = "100vh";
-              container.style.margin = "0";
             } else {
               // Landscape mode - small bottom padding for navigation widget
               container.style.width = "100vw";
               container.style.height = "56.25vw";
               container.style.maxWidth = "177.78vh";
               container.style.maxHeight = "calc(100vh - 20px)";
-              container.style.marginBottom = "20px";
             }
             
             // Resize Unity canvas if instance exists
