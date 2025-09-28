@@ -15,10 +15,6 @@
         background-size: 200px 200px;
         animation: scrollBackground 20s linear infinite;
         overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
       }
       
       @keyframes scrollBackground {
@@ -28,84 +24,6 @@
         100% {
           background-position: 200px 200px;
         }
-      }
-
-      /* Unity Container - Use 100% height until limit, then maintain 16:9 aspect ratio */
-      #unity-container {
-        position: relative;
-        width: 100%;
-        height: 100vh; /* Use full viewport height */
-        max-width: 177.78vh; /* 16:9 aspect ratio (16/9 = 1.7778) */
-        max-height: 100vh; /* Prevent container from being too tall */
-        background: #000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      #unity-canvas {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain;
-      }
-
-      /* Mobile/Tablet specific styles */
-      @media (max-width: 768px) {
-        #unity-container {
-          width: 100vw;
-          height: 100vh;
-          max-width: 100vw;
-          max-height: 100vh;
-        }
-      }
-
-      /* Landscape orientation for tablets/phones */
-      @media (orientation: landscape) and (max-width: 1024px) {
-        #unity-container {
-          width: 100vw;
-          height: 100vh;
-          max-width: 177.78vh;
-          max-height: calc(100vh - 20px);
-        }
-      }
-
-      /* Portrait orientation for phones */
-      @media (orientation: portrait) and (max-width: 768px) {
-        #unity-container {
-          width: 100vw;
-          height: 100vh;
-          max-width: 100vw;
-          max-height: 100vh;
-        }
-      }
-
-      /* Unity loading bar and footer positioning */
-      #unity-loading-bar, #unity-footer {
-        position: absolute;
-        width: 100%;
-        z-index: 10;
-      }
-
-      #unity-loading-bar {
-        top: 50%;
-        transform: translateY(-50%);
-      }
-
-      #unity-footer {
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 15;
-        background: rgba(0, 0, 0, 0.8);
-        padding: 5px 0;
-      }
-
-      #unity-warning {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 20;
       }
 
       #webgl-error {
