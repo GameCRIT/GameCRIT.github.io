@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>GameCRIT</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
-    <link rel="stylesheet" href="TemplateData/style.css" />
-
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
     <style>
       /* Rolling Background */
       body {
         margin: 0;
         padding: 0;
-        background: #000 url("Images/bg.png") repeat;
+        background: url('Images/bg.png') repeat;
         background-size: 200px 200px;
         animation: scrollBackground 20s linear infinite;
-        overflow: hidden; /* keep the page from scrolling while we center */
+        overflow: hidden;
       }
-
+      
       @keyframes scrollBackground {
         0% {
           background-position: 0 0;
@@ -27,76 +26,6 @@
         }
       }
 
-      /* === 16:9 responsive frame (no stretch) ===
-         - The outer frame fills the viewport and centers the 16:9 area.
-         - The inner frame enforces 16:9 and scales down as needed.
-         - Black letterboxing (from body/background) shows when needed. */
-      #unity-frame-outer {
-        position: fixed;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        /* optional subtle backdrop to make letterbox bars look solid */
-        background: rgba(0, 0, 0, 0.65);
-      }
-
-      /* The 16:9 container:
-         - Width chooses the limiting dimension using min(100vw, 100vh * 16/9)
-         - aspect-ratio guarantees height follows width without distortion
-         - max-height ensures it never exceeds the viewport vertically */
-      #unity-frame {
-        aspect-ratio: 16 / 9;
-        width: min(100vw, calc(100vh * (16 / 9)));
-        max-height: 100vh;
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden; /* keeps Unity and overlays clipped to the frame */
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-        background: #000; /* behind canvas during load */
-      }
-
-      /* Keep your original Unity container inside the frame and make it fill */
-      #unity-container {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      /* Make the canvas perfectly fill the 16:9 frame without stretch */
-      #unity-canvas {
-        width: 100% !important;
-        height: 100% !important;
-        display: block;
-      }
-
-      /* Put the footer inside the frame; keep it over the canvas */
-      #unity-footer {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 6px 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        pointer-events: none; /* footer is decorative; allow clicks to game */
-      }
-      #unity-fullscreen-button {
-        pointer-events: auto; /* but the fullscreen button should be clickable */
-      }
-
-      /* Loading, progress, warning overlays should stack above the canvas */
-      #unity-loading-bar,
-      #unity-warning {
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        z-index: 5;
-      }
-
-      /* WebGL error popup */
       #webgl-error {
         display: none;
         position: fixed;
@@ -170,7 +99,7 @@
       }
 
       #explorer-helper button {
-        background: #4caf50;
+        background: #4CAF50;
         color: white;
         border: none;
         padding: 8px 16px;
@@ -208,49 +137,25 @@
         z-index: 1000;
         font-size: 12px;
       }
-
-      /* Optional: tweak Unity template classes if they exist */
-      .unity-desktop,
-      .unity-mobile {
-        width: 100%;
-        height: 100%;
-      }
-
-      /* Avoid accidental text selection while playing */
-      canvas,
-      body {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
     </style>
   </head>
-
   <body>
-    <!-- 16:9 centered frame -->
-    <div id="unity-frame-outer">
-      <div id="unity-frame">
-        <div id="unity-container" class="unity-desktop">
-          <canvas id="unity-canvas" width="960" height="540" tabindex="-1"></canvas>
-
-          <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div id="unity-progress-bar-empty">
-              <div id="unity-progress-bar-full"></div>
-            </div>
-          </div>
-
-          <div id="unity-warning"></div>
-
-          <div id="unity-footer">
-            <div id="unity-webgl-logo"></div>
-            <div id="unity-fullscreen-button"></div>
-            <div id="unity-build-title">GameCRIT</div>
-          </div>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
         </div>
       </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">GameCRIT</div>
+      </div>
     </div>
-
+    
     <div id="webgl-error">
       <h3>WebGL Error Detected</h3>
       <p id="error-message">Your browser doesn't support WebGL or it's disabled.</p>
@@ -289,7 +194,7 @@
       <p>• <code>Escape</code> - Close all helpers</p>
       <p>• <code>Right-click</code> - Context menu with paste option</p>
       <p>• <code>?</code> button - Toggle this help</p>
-      <br />
+      <br>
       <p><strong>Features:</strong></p>
       <p>• Rolling background animation</p>
       <p>• Video iframe embedding</p>
@@ -297,30 +202,16 @@
       <p>• WebGL error handling</p>
       <p>• Enhanced clipboard support</p>
       <p>• Input field paste functionality</p>
-      <br />
-      <button
-        onclick="toggleHelp()"
-        style="
-          background: #ff4444;
-          color: white;
-          border: none;
-          padding: 5px 10px;
-          border-radius: 3px;
-          cursor: pointer;
-        "
-      >
-        Close Help
-      </button>
+      <br>
+      <button onclick="toggleHelp()" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Close Help</button>
     </div>
 
     <script>
       // WebGL compatibility check
       function checkWebGLSupport() {
         try {
-          var canvas = document.createElement("canvas");
-          var gl =
-            canvas.getContext("webgl") ||
-            canvas.getContext("experimental-webgl");
+          var canvas = document.createElement('canvas');
+          var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
           return gl !== null && gl !== undefined;
         } catch (e) {
           return false;
@@ -328,138 +219,118 @@
       }
 
       function showWebGLError(message) {
-        document.getElementById("error-message").textContent = message;
-        document.getElementById("webgl-error").style.display = "block";
-        document.getElementById("unity-frame").style.filter = "blur(5px)";
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('webgl-error').style.display = 'block';
+        document.getElementById('unity-container').style.filter = 'blur(5px)';
       }
 
       function hideError() {
-        document.getElementById("webgl-error").style.display = "none";
-        document.getElementById("unity-frame").style.filter = "none";
+        document.getElementById('webgl-error').style.display = 'none';
+        document.getElementById('unity-container').style.filter = 'none';
       }
 
       function showWebGLHelp() {
-        var helpText =
-          "To fix WebGL issues:\n\n" +
-          "1. Update your browser to the latest version\n" +
-          "2. Enable WebGL in browser settings:\n" +
-          "   - Chrome: chrome://flags → Enable WebGL\n" +
-          "   - Firefox: about:config → Set webgl.disabled to false\n" +
-          "3. Enable Hardware Acceleration in browser settings\n" +
-          "4. Update your graphics drivers\n" +
-          "5. Try a different browser";
+        var helpText = "To fix WebGL issues:\n\n" +
+                      "1. Update your browser to the latest version\n" +
+                      "2. Enable WebGL in browser settings:\n" +
+                      "   - Chrome: chrome://flags → Enable WebGL\n" +
+                      "   - Firefox: about:config → Set webgl.disabled to false\n" +
+                      "3. Enable Hardware Acceleration in browser settings\n" +
+                      "4. Update your graphics drivers\n" +
+                      "5. Try a different browser";
         alert(helpText);
       }
 
       // Video Helper Functions
       function updateIframe(url) {
         console.log("Updating iframe with URL:", url);
-        document.getElementById("video-iframe").src = url;
-        document.getElementById("video-container").style.display = "block";
+        document.getElementById('video-iframe').src = url;
+        document.getElementById('video-container').style.display = 'block';
       }
 
       function closeVideo() {
-        document.getElementById("video-container").style.display = "none";
-        document.getElementById("video-iframe").src = "";
+        document.getElementById('video-container').style.display = 'none';
+        document.getElementById('video-iframe').src = '';
       }
 
       // Explorer Helper Functions
       function openFileExplorer() {
-        var input = document.createElement("input");
-        input.type = "file";
+        // For security reasons, browsers can't directly open file explorer
+        // This creates a file input dialog instead
+        var input = document.createElement('input');
+        input.type = 'file';
         input.multiple = true;
         input.webkitdirectory = true; // Allow folder selection
-        input.onchange = function (e) {
-          console.log("Selected files:", e.target.files);
-          alert("Selected " + e.target.files.length + " files");
+        input.onchange = function(e) {
+          console.log('Selected files:', e.target.files);
+          // You can process the selected files here
+          alert('Selected ' + e.target.files.length + ' files');
         };
         input.click();
       }
 
       function openDownloads() {
+        // Open downloads folder (browser-specific)
         try {
-          window.open(
-            "file:///C:/Users/" +
-              (navigator.userAgent.includes("Windows")
-                ? (window.USERNAME || "Default")
-                : "Default") +
-              "/Downloads/",
-            "_blank"
-          );
+          window.open('file:///C:/Users/' + (navigator.userAgent.includes('Windows') ? 
+            (process.env.USERNAME || 'Default') : 'Default') + '/Downloads/', '_blank');
         } catch (e) {
-          alert(
-            "Cannot directly access Downloads folder due to browser security restrictions.\nTry using Ctrl+J to open downloads in Chrome or Ctrl+Shift+Y in Firefox."
-          );
+          alert('Cannot directly access Downloads folder due to browser security restrictions.\nTry using Ctrl+J to open downloads in Chrome or Ctrl+Shift+Y in Firefox.');
         }
       }
 
       function openDocuments() {
+        // Open documents folder (browser-specific)
         try {
-          window.open(
-            "file:///C:/Users/" +
-              (navigator.userAgent.includes("Windows")
-                ? (window.USERNAME || "Default")
-                : "Default") +
-              "/Documents/",
-            "_blank"
-          );
+          window.open('file:///C:/Users/' + (navigator.userAgent.includes('Windows') ? 
+            (process.env.USERNAME || 'Default') : 'Default') + '/Documents/', '_blank');
         } catch (e) {
-          alert(
-            "Cannot directly access Documents folder due to browser security restrictions.\nConsider using the File Explorer option instead."
-          );
+          alert('Cannot directly access Documents folder due to browser security restrictions.\nConsider using the File Explorer option instead.');
         }
       }
 
       function closeExplorer() {
-        document.getElementById("explorer-helper").style.display = "none";
+        document.getElementById('explorer-helper').style.display = 'none';
       }
 
       function showExplorer() {
-        document.getElementById("explorer-helper").style.display = "block";
+        document.getElementById('explorer-helper').style.display = 'block';
       }
 
       function toggleHelp() {
-        var helpOverlay = document.getElementById("help-overlay");
-        var helpToggle = document.getElementById("help-toggle");
-
-        if (helpOverlay.style.display === "none" || helpOverlay.style.display === "") {
-          helpOverlay.style.display = "block";
-          helpToggle.style.display = "none";
+        var helpOverlay = document.getElementById('help-overlay');
+        var helpToggle = document.getElementById('help-toggle');
+        
+        if (helpOverlay.style.display === 'none' || helpOverlay.style.display === '') {
+          helpOverlay.style.display = 'block';
+          helpToggle.style.display = 'none';
         } else {
-          helpOverlay.style.display = "none";
-          helpToggle.style.display = "block";
+          helpOverlay.style.display = 'none';
+          helpToggle.style.display = 'block';
         }
       }
 
       // Global functions for Unity to call
       window.updateIframe = updateIframe;
       window.showExplorer = showExplorer;
-
+      
       // OpenURL function for Unity
-      window.openURL = function (url) {
-        window.open(url, "_blank");
+      window.openURL = function(url) {
+        window.open(url, '_blank');
       };
 
       // Clipboard functionality for WebGL (Unity-compatible)
-      window.copyToClipboard = function (text) {
-        console.log("CopyToClipboard called from Unity with text:", text);
-        if (
-          navigator.clipboard &&
-          (window.isSecureContext ||
-            location.protocol === "https:" ||
-            location.hostname === "localhost")
-        ) {
-          navigator.clipboard
-            .writeText(text)
-            .then(() => {
-              console.log("Text copied to clipboard successfully");
-            })
-            .catch((err) => {
-              console.error("Failed to copy text: ", err);
-              fallbackCopyTextToClipboard(text);
-            });
+      window.copyToClipboard = function(text) {
+        console.log('CopyToClipboard called from Unity with text:', text);
+        if (navigator.clipboard && (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) {
+          navigator.clipboard.writeText(text).then(() => {
+            console.log('Text copied to clipboard successfully');
+          }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            fallbackCopyTextToClipboard(text);
+          });
         } else {
-          console.log("Clipboard API not available, using fallback");
+          console.log('Clipboard API not available, using fallback');
           fallbackCopyTextToClipboard(text);
         }
       };
@@ -474,78 +345,79 @@
         textArea.focus();
         textArea.select();
         try {
-          var successful = document.execCommand("copy");
-          console.log(
-            "Fallback: Copying text command was " + (successful ? "successful" : "unsuccessful")
-          );
+          var successful = document.execCommand('copy');
+          console.log('Fallback: Copying text command was ' + (successful ? 'successful' : 'unsuccessful'));
         } catch (err) {
-          console.error("Fallback: Oops, unable to copy", err);
+          console.error('Fallback: Oops, unable to copy', err);
         }
         document.body.removeChild(textArea);
       }
 
-      window.pasteFromClipboard = function () {
-        console.log("PasteFromClipboard called from Unity");
-
+      window.pasteFromClipboard = function() {
+        console.log('PasteFromClipboard called from Unity');
+        
         if (navigator.clipboard && window.isSecureContext) {
-          return navigator.clipboard
-            .readText()
-            .then((text) => {
-              console.log("Text pasted from clipboard:", text);
-              return text;
-            })
-            .catch((err) => {
-              console.error("Failed to read clipboard: ", err);
-              return fallbackPasteFromClipboard();
-            });
+          return navigator.clipboard.readText().then(text => {
+            console.log('Text pasted from clipboard:', text);
+            return text;
+          }).catch(err => {
+            console.error('Failed to read clipboard: ', err);
+            // Fallback to temporary input method
+            return fallbackPasteFromClipboard();
+          });
         } else {
-          console.log("Clipboard API not available, using fallback");
+          console.log('Clipboard API not available, using fallback');
           return fallbackPasteFromClipboard();
         }
       };
 
       function fallbackPasteFromClipboard() {
         return new Promise((resolve) => {
-          console.log("Using fallback paste method");
-
-          var tempInput = document.createElement("input");
-          tempInput.style.position = "absolute";
-          tempInput.style.left = "-9999px";
-          tempInput.style.opacity = "0";
-          tempInput.style.pointerEvents = "none";
+          console.log('Using fallback paste method');
+          
+          // Create a temporary input element
+          var tempInput = document.createElement('input');
+          tempInput.style.position = 'absolute';
+          tempInput.style.left = '-9999px';
+          tempInput.style.opacity = '0';
+          tempInput.style.pointerEvents = 'none';
           document.body.appendChild(tempInput);
-
+          
+          // Focus the input and select all
           tempInput.focus();
           tempInput.select();
-
-          var pasteHandler = function (e) {
-            var pastedText = e.clipboardData.getData("text/plain");
-            console.log("Fallback paste detected:", pastedText);
+          
+          // Set up paste event listener
+          var pasteHandler = function(e) {
+            var pastedText = e.clipboardData.getData('text/plain');
+            console.log('Fallback paste detected:', pastedText);
             document.body.removeChild(tempInput);
-            resolve(pastedText || "");
+            resolve(pastedText || '');
           };
-
-          tempInput.addEventListener("paste", pasteHandler, { once: true });
-
+          
+          tempInput.addEventListener('paste', pasteHandler, { once: true });
+          
+          // Try to trigger paste with execCommand
           setTimeout(() => {
             try {
-              var success = document.execCommand("paste");
-              console.log("execCommand paste result:", success);
+              var success = document.execCommand('paste');
+              console.log('execCommand paste result:', success);
               if (!success) {
-                console.log("Waiting for manual paste...");
+                // If execCommand fails, wait for user to paste manually
+                console.log('Waiting for manual paste...');
                 setTimeout(() => {
                   if (document.body.contains(tempInput)) {
                     document.body.removeChild(tempInput);
-                    resolve("");
+                    resolve('');
                   }
                 }, 3000);
               }
             } catch (err) {
-              console.error("execCommand paste failed:", err);
+              console.error('execCommand paste failed:', err);
               setTimeout(() => {
                 if (document.body.contains(tempInput)) {
                   document.body.removeChild(tempInput);
-                  resolve("");
+                  resolve('');
                 }
               }, 3000);
             }
@@ -554,56 +426,58 @@
       }
 
       // Keyboard shortcuts for helpers (avoiding interference with paste)
-      document.addEventListener("keydown", function (e) {
-        if (e.ctrlKey && e.key === "e") {
+      document.addEventListener('keydown', function(e) {
+        // Ctrl + E = Show Explorer Helper
+        if (e.ctrlKey && e.key === 'e') {
           e.preventDefault();
-          var explorerHelper = document.getElementById("explorer-helper");
-          if (explorerHelper.style.display === "none" || explorerHelper.style.display === "") {
+          var explorerHelper = document.getElementById('explorer-helper');
+          if (explorerHelper.style.display === 'none' || explorerHelper.style.display === '') {
             showExplorer();
           } else {
             closeExplorer();
           }
         }
-
-        if (e.ctrlKey && e.shiftKey && e.key === "V") {
+        
+        // Ctrl + Shift + V = Show/Hide Video Container (changed to avoid conflict)
+        if (e.ctrlKey && e.shiftKey && e.key === 'V') {
           e.preventDefault();
-          var videoContainer = document.getElementById("video-container");
-          var iframe = document.getElementById("video-iframe");
-          if (iframe.src && iframe.src !== "") {
-            if (videoContainer.style.display === "none" || videoContainer.style.display === "") {
-              videoContainer.style.display = "block";
+          var videoContainer = document.getElementById('video-container');
+          var iframe = document.getElementById('video-iframe');
+          if (iframe.src && iframe.src !== '') {
+            if (videoContainer.style.display === 'none' || videoContainer.style.display === '') {
+              videoContainer.style.display = 'block';
             } else {
-              videoContainer.style.display = "none";
+              videoContainer.style.display = 'none';
             }
           }
         }
-
-        if (e.key === "Escape") {
+        
+        // Escape = Close all helpers
+        if (e.key === 'Escape') {
           closeVideo();
           closeExplorer();
           hideError();
         }
       });
 
-      document.addEventListener("paste", function () {
-        console.log("Paste event detected");
+      // Support Unity's paste functionality
+      document.addEventListener('paste', function(e) {
+        console.log('Paste event detected');
+        // Let Unity handle the paste naturally, just ensure it gets through
       });
 
-      document.addEventListener("contextmenu", function (e) {
+      // Right-click context menu support for better paste experience
+      document.addEventListener('contextmenu', function(e) {
         var activeElement = document.activeElement;
-        if (
-          activeElement &&
-          (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA")
-        ) {
+        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+          // Allow context menu for input fields to enable right-click paste
           return;
         }
       });
 
       // Check WebGL support before loading Unity
       if (!checkWebGLSupport()) {
-        showWebGLError(
-          "WebGL is not supported or enabled in your browser. Please check your browser settings."
-        );
+        showWebGLError("WebGL is not supported or enabled in your browser. Please check your browser settings.");
       }
 
       var container = document.querySelector("#unity-container");
@@ -613,17 +487,23 @@
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
       var warningBanner = document.querySelector("#unity-warning");
 
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? "block" : "none";
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
-        var div = document.createElement("div");
+        var div = document.createElement('div');
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type == "error") div.style = "background: red; padding: 2px;";
+        if (type == 'error') div.style = 'background: red; padding: 2px;';
         else {
-          if (type == "warning") div.style = "background: yellow; padding: 2px;";
-          setTimeout(function () {
+          if (type == 'warning') div.style = 'background: yellow; padding: 2px;';
+          setTimeout(function() {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
@@ -643,29 +523,33 @@
         productName: "Gamecrit",
         productVersion: "1.0",
         showBanner: unityShowBanner,
-        // Important: keep canvas & WebGL size matched to DOM size for crisp scaling
-        // (This is Unity's default, but leaving it explicit for clarity)
-        // matchWebGLToCanvasSize: true
       };
 
-      // Mobile: use proper viewport meta; we still keep the 16:9 frame.
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        var meta = document.createElement("meta");
-        meta.name = "viewport";
-        meta.content =
-          "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
-        document.getElementsByTagName("head")[0].appendChild(meta);
+        // Mobile device style: fill the whole browser client area with the game canvas:
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
         container.className = "unity-mobile";
         canvas.className = "unity-mobile";
 
-        // Optional perf tweak on mobile:
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
         // config.devicePixelRatio = 1;
 
-        // (You can remove this banner if you do support mobile)
-        // unityShowBanner('WebGL builds are not supported on mobile devices.');
+        unityShowBanner('WebGL builds are not supported on mobile devices.');
       } else {
-        // Desktop: DO NOT set fixed px sizes; let CSS control 16:9 responsive sizing.
-        // The CSS above ensures the canvas always fills the frame without stretching.
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
       }
 
       loadingBar.style.display = "block";
@@ -675,223 +559,181 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        })
-          .then((unityInstance) => {
-            loadingBar.style.display = "none";
-            fullscreenButton.onclick = () => {
-              unityInstance.SetFullscreen(1);
-            };
-
-            // Store unity instance globally for clipboard functions
-            window.unityInstance = unityInstance;
-            window.gameInstance = unityInstance; // jslib compatibility
-
-            // Add Unity jslib-compatible clipboard functions
-            window.IsClipboardSupported = function () {
-              return navigator.clipboard &&
-                navigator.clipboard.readText &&
-                (window.isSecureContext ||
-                  location.protocol === "https:" ||
-                  location.hostname === "localhost")
-                ? 1
-                : 0;
-            };
-
-            window.RequestClipboardTextJS = function (objectName, methodName) {
-              console.log("RequestClipboardTextJS called:", objectName, methodName);
-
-              if (
-                navigator.clipboard &&
-                (window.isSecureContext ||
-                  location.protocol === "https:" ||
-                  location.hostname === "localhost")
-              ) {
-                navigator.clipboard
-                  .readText()
-                  .then(function (text) {
-                    console.log("Clipboard text read successfully:", text);
-                    if (window.gameInstance && window.gameInstance.SendMessage) {
-                      window.gameInstance.SendMessage(objectName, methodName, text || "");
-                    } else {
-                      console.warn("gameInstance not available for SendMessage");
-                    }
-                  })
-                  .catch(function (err) {
-                    console.error("Failed to read clipboard:", err);
-                    if (window.gameInstance && window.gameInstance.SendMessage) {
-                      window.gameInstance.SendMessage(objectName, methodName, "");
-                    }
-                  });
+              }).then((unityInstance) => {
+        loadingBar.style.display = "none";
+        fullscreenButton.onclick = () => {
+          unityInstance.SetFullscreen(1);
+        };
+        
+        // Store unity instance globally for clipboard functions
+        window.unityInstance = unityInstance;
+        window.gameInstance = unityInstance; // Also store as gameInstance for jslib compatibility
+        
+        // Add Unity jslib-compatible clipboard functions
+        window.IsClipboardSupported = function() {
+          return (navigator.clipboard && navigator.clipboard.readText && 
+                  (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) ? 1 : 0;
+        };
+        
+        window.RequestClipboardTextJS = function(objectName, methodName) {
+          console.log('RequestClipboardTextJS called:', objectName, methodName);
+          
+          if (navigator.clipboard && (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) {
+            navigator.clipboard.readText().then(function(text) {
+              console.log('Clipboard text read successfully:', text);
+              if (window.gameInstance && window.gameInstance.SendMessage) {
+                window.gameInstance.SendMessage(objectName, methodName, text || "");
               } else {
-                console.warn("Clipboard API not supported or not in secure context");
-                if (window.gameInstance && window.gameInstance.SendMessage) {
-                  window.gameInstance.SendMessage(objectName, methodName, "");
+                console.warn('gameInstance not available for SendMessage');
+              }
+            }).catch(function(err) {
+              console.error('Failed to read clipboard:', err);
+              if (window.gameInstance && window.gameInstance.SendMessage) {
+                window.gameInstance.SendMessage(objectName, methodName, "");
+              }
+            });
+          } else {
+            console.warn('Clipboard API not supported or not in secure context');
+            if (window.gameInstance && window.gameInstance.SendMessage) {
+              window.gameInstance.SendMessage(objectName, methodName, "");
+            }
+          }
+        };
+        
+        // Enable input field interactions for WebGL
+        window.focusInputField = function(inputId) {
+          var input = document.getElementById(inputId);
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        };
+        
+        // Function to create temporary input for paste operations
+        window.createTempInput = function(callback) {
+          var tempInput = document.createElement('input');
+          tempInput.style.position = 'absolute';
+          tempInput.style.left = '-9999px';
+          tempInput.style.opacity = '0';
+          document.body.appendChild(tempInput);
+          tempInput.focus();
+          
+          tempInput.addEventListener('paste', function(e) {
+            var pastedText = e.clipboardData.getData('text/plain');
+            if (callback && pastedText) {
+              callback(pastedText);
+            }
+            document.body.removeChild(tempInput);
+          }, { once: true });
+          
+          // Remove temp input after 5 seconds if no paste occurred
+          setTimeout(() => {
+            if (document.body.contains(tempInput)) {
+              document.body.removeChild(tempInput);
+            }
+          }, 5000);
+        };
+
+        // Unity-specific paste function that returns a string directly
+        window.GetClipboardText = function() {
+          console.log('GetClipboardText called from Unity');
+          
+          if (navigator.clipboard && window.isSecureContext) {
+            // For async clipboard API, we need to handle this differently
+            navigator.clipboard.readText().then(text => {
+              console.log('Clipboard text retrieved:', text);
+              if (window.unityInstance) {
+                try {
+                  window.unityInstance.SendMessage('ClipboardManager', 'OnClipboardTextReceived', text);
+                } catch (err) {
+                  console.log('Unity clipboard message not available');
                 }
               }
-            };
-
-            // Enable input field interactions for WebGL
-            window.focusInputField = function (inputId) {
-              var input = document.getElementById(inputId);
-              if (input) {
-                input.focus();
-                input.select();
+            }).catch(err => {
+              console.error('Failed to read clipboard:', err);
+              if (window.unityInstance) {
+                try {
+                  window.unityInstance.SendMessage('ClipboardManager', 'OnClipboardTextReceived', '');
+                } catch (err) {
+                  console.log('Unity clipboard message not available');
+                }
               }
-            };
+            });
+            return 'ASYNC_CLIPBOARD_REQUEST'; // Indicate async operation
+          } else {
+            console.log('Clipboard API not available');
+            return '';
+          }
+        };
 
-            // Function to create temporary input for paste operations
-            window.createTempInput = function (callback) {
-              var tempInput = document.createElement("input");
-              tempInput.style.position = "absolute";
-              tempInput.style.left = "-9999px";
-              tempInput.style.opacity = "0";
-              document.body.appendChild(tempInput);
-              tempInput.focus();
-
-              tempInput.addEventListener(
-                "paste",
-                function (e) {
-                  var pastedText = e.clipboardData.getData("text/plain");
-                  if (callback && pastedText) {
-                    callback(pastedText);
-                  }
-                  document.body.removeChild(tempInput);
-                },
-                { once: true }
-              );
-
-              setTimeout(() => {
-                if (document.body.contains(tempInput)) {
-                  document.body.removeChild(tempInput);
+        // Alternative synchronous paste function using user interaction
+        window.RequestPaste = function() {
+          console.log('RequestPaste called from Unity - creating temp input');
+          
+          var tempInput = document.createElement('input');
+          tempInput.style.position = 'fixed';
+          tempInput.style.top = '50%';
+          tempInput.style.left = '50%';
+          tempInput.style.transform = 'translate(-50%, -50%)';
+          tempInput.style.zIndex = '10000';
+          tempInput.style.padding = '10px';
+          tempInput.style.border = '2px solid #4CAF50';
+          tempInput.style.borderRadius = '5px';
+          tempInput.style.backgroundColor = 'white';
+          tempInput.placeholder = 'Press Ctrl+V to paste, then press Enter';
+          document.body.appendChild(tempInput);
+          tempInput.focus();
+          
+          tempInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              var text = tempInput.value;
+              console.log('Manual paste received:', text);
+              document.body.removeChild(tempInput);
+              
+              if (window.unityInstance && text) {
+                try {
+                  window.unityInstance.SendMessage('ClipboardManager', 'OnClipboardTextReceived', text);
+                } catch (err) {
+                  console.log('Unity clipboard message not available');
                 }
-              }, 5000);
-            };
-
-            // Unity-specific paste function that returns a string directly
-            window.GetClipboardText = function () {
-              console.log("GetClipboardText called from Unity");
-
-              if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard
-                  .readText()
-                  .then((text) => {
-                    console.log("Clipboard text retrieved:", text);
-                    if (window.unityInstance) {
-                      try {
-                        window.unityInstance.SendMessage(
-                          "ClipboardManager",
-                          "OnClipboardTextReceived",
-                          text
-                        );
-                      } catch (err) {
-                        console.log("Unity clipboard message not available");
-                      }
-                    }
-                  })
-                  .catch((err) => {
-                    console.error("Failed to read clipboard:", err);
-                    if (window.unityInstance) {
-                      try {
-                        window.unityInstance.SendMessage(
-                          "ClipboardManager",
-                          "OnClipboardTextReceived",
-                          ""
-                        );
-                      } catch (err) {
-                        console.log("Unity clipboard message not available");
-                      }
-                    }
-                  });
-                return "ASYNC_CLIPBOARD_REQUEST";
-              } else {
-                console.log("Clipboard API not available");
-                return "";
               }
-            };
-
-            // Alternative synchronous paste function using user interaction
-            window.RequestPaste = function () {
-              console.log("RequestPaste called from Unity - creating temp input");
-
-              var tempInput = document.createElement("input");
-              tempInput.style.position = "fixed";
-              tempInput.style.top = "50%";
-              tempInput.style.left = "50%";
-              tempInput.style.transform = "translate(-50%, -50%)";
-              tempInput.style.zIndex = "10000";
-              tempInput.style.padding = "10px";
-              tempInput.style.border = "2px solid #4CAF50";
-              tempInput.style.borderRadius = "5px";
-              tempInput.style.backgroundColor = "white";
-              tempInput.placeholder = "Press Ctrl+V to paste, then press Enter";
-              document.body.appendChild(tempInput);
-              tempInput.focus();
-
-              tempInput.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                  var text = tempInput.value;
-                  console.log("Manual paste received:", text);
-                  document.body.removeChild(tempInput);
-
-                  if (window.unityInstance && text) {
-                    try {
-                      window.unityInstance.SendMessage(
-                        "ClipboardManager",
-                        "OnClipboardTextReceived",
-                        text
-                      );
-                    } catch (err) {
-                      console.log("Unity clipboard message not available");
-                    }
-                  }
-                } else if (e.key === "Escape") {
-                  document.body.removeChild(tempInput);
-                }
-              });
-
-              setTimeout(() => {
-                if (document.body.contains(tempInput)) {
-                  document.body.removeChild(tempInput);
-                }
-              }, 10000);
-            };
-          })
-          .catch((message) => {
-            console.error("Unity instance creation failed:", message);
-            showWebGLError("Failed to start the game: " + message);
+            } else if (e.key === 'Escape') {
+              document.body.removeChild(tempInput);
+            }
           });
+          
+          // Auto-remove after 10 seconds
+          setTimeout(() => {
+            if (document.body.contains(tempInput)) {
+              document.body.removeChild(tempInput);
+            }
+          }, 10000);
+        };
+        
+      }).catch((message) => {
+          console.error('Unity instance creation failed:', message);
+          showWebGLError('Failed to start the game: ' + message);
+        });
       };
-
+      
       script.onerror = () => {
-        console.error("Failed to load Unity loader script");
-        showWebGLError(
-          "Failed to load game files. Please check your internet connection and try again."
-        );
+        console.error('Failed to load Unity loader script');
+        showWebGLError('Failed to load game files. Please check your internet connection and try again.');
       };
-
+      
       document.body.appendChild(script);
 
       // Additional error handling for WebGL context loss
-      canvas.addEventListener(
-        "webglcontextlost",
-        function (e) {
-          console.error("WebGL context lost:", e);
-          showWebGLError(
-            "WebGL context was lost. This may be due to browser or system issues. Please try refreshing the page."
-          );
-          e.preventDefault();
-        },
-        false
-      );
+      canvas.addEventListener('webglcontextlost', function(e) {
+        console.error('WebGL context lost:', e);
+        showWebGLError('WebGL context was lost. This may be due to browser or system issues. Please try refreshing the page.');
+        e.preventDefault();
+      }, false);
 
-      canvas.addEventListener(
-        "webglcontextrestored",
-        function (e) {
-          console.log("WebGL context restored:", e);
-          hideError();
-        },
-        false
-      );
+      canvas.addEventListener('webglcontextrestored', function(e) {
+        console.log('WebGL context restored:', e);
+        hideError();
+      }, false);
     </script>
   </body>
 </html>
