@@ -3,106 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>GameCRIT</title>
+    <title>Unity Web Player | Gamecrit</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <style>
-      /* Rolling Background (unchanged) */
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #262626;
-        background-size: 200px 200px;
-        animation: scrollBackground 20s linear infinite;
-        overflow: hidden;
-      }
-      @keyframes scrollBackground {
-        0% { background-position: 0 0; }
-        100% { background-position: 200px 200px; }
-      }
-
-      /* === ONLY NEW LINES YOU REALLY NEED === */
-      /* Center the game and let JS set exact px size to keep 16:9 */
-      #unity-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      /* Make canvas follow the size we set in JS */
-      #unity-canvas { display: block; }
-
-      /* Existing styles you had */
-      #webgl-error {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #ff4444;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        z-index: 1000;
-        max-width: 500px;
-      }
-      #webgl-error button {
-        background: white;
-        color: #ff4444;
-        border: none;
-        padding: 10px 20px;
-        margin: 10px;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-
-      #video-container {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        width: 300px;
-        height: 200px;
-        background: rgba(0, 0, 0, 0.8);
-        border-radius: 10px;
-        padding: 10px;
-        display: none;
-        z-index: 999;
-      }
-      #video-iframe { width: 100%; height: 100%; border: none; border-radius: 5px; }
-      #close-video {
-        position: absolute; top: 5px; right: 5px;
-        background: #ff4444; color: white; border: none; border-radius: 50%;
-        width: 25px; height: 25px; cursor: pointer; font-size: 14px;
-      }
-
-      #explorer-helper {
-        position: fixed; bottom: 10px; left: 10px;
-        background: rgba(0, 0, 0, 0.8); color: white; padding: 10px;
-        border-radius: 10px; display: none; z-index: 999;
-      }
-      #explorer-helper button {
-        background: #4CAF50; color: white; border: none;
-        padding: 8px 16px; margin: 5px; border-radius: 5px; cursor: pointer;
-      }
-
-      #help-overlay {
-        position: fixed; top: 10px; left: 10px;
-        background: rgba(0, 0, 0, 0.9); color: white; padding: 15px;
-        border-radius: 10px; font-family: monospace; font-size: 12px;
-        z-index: 1001; max-width: 250px; display: none;
-      }
-      #help-toggle {
-        position: fixed; top: 10px; left: 10px;
-        background: rgba(0, 0, 0, 0.7); color: white; border: none; padding: 5px 10px;
-        border-radius: 5px; cursor: pointer; z-index: 1000; font-size: 12px;
-      }
-    </style>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <!-- width/height attribute left at 960x540 (16:9); JS resizes DOM size anyway -->
-      <canvas id="unity-canvas" width="960" height="540" tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -111,191 +18,31 @@
       </div>
       <div id="unity-warning"> </div>
       <div id="unity-footer">
-        <div id="unity-webgl-logo"></div>
+        <div id="unity-logo-title-footer"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">GameCRIT</div>
+        <div id="unity-build-title">Gamecrit</div>
       </div>
     </div>
-    
-    <div id="webgl-error">
-      <h3>WebGL Error Detected</h3>
-      <p id="error-message">Your browser doesn't support WebGL or it's disabled.</p>
-      <div>
-        <button onclick="location.reload()">Retry</button>
-        <button onclick="showWebGLHelp()">Help</button>
-        <button onclick="hideError()">Close</button>
-      </div>
-    </div>
-
-    <!-- Video Helper Container -->
-    <div id="video-container">
-      <button id="close-video" onclick="closeVideo()">×</button>
-      <iframe id="video-iframe" src="" allowfullscreen></iframe>
-    </div>
-
-    <!-- Explorer Helper -->
-    <div id="explorer-helper">
-      <h4>Explorer Helper</h4>
-      <button onclick="openFileExplorer()">Open File Explorer</button>
-      <button onclick="openDownloads()">Downloads Folder</button>
-      <button onclick="openDocuments()">Documents Folder</button>
-      <button onclick="closeExplorer()">Close</button>
-    </div>
-
-
-    <!-- Help Overlay -->
-    <div id="help-overlay">
-      <h4>GameCRIT WebGL Helpers</h4>
-      <p><strong>Keyboard Shortcuts:</strong></p>
-      <p>• <code>Ctrl + E</code> - Toggle Explorer Helper</p>
-      <p>• <code>Ctrl + V</code> - Paste in input fields (normal paste)</p>
-      <p>• <code>Ctrl + Shift + V</code> - Toggle Video (if loaded)</p>
-      <p>• <code>Escape</code> - Close all helpers</p>
-      <p>• <code>Right-click</code> - Context menu with paste option</p>
-      <p>• <code>?</code> button - Toggle this help</p>
-      <br>
-      <p><strong>Features:</strong></p>
-      <p>• Rolling background animation</p>
-      <p>• Video iframe embedding</p>
-      <p>• File system helpers</p>
-      <p>• WebGL error handling</p>
-      <p>• Enhanced clipboard support</p>
-      <p>• Input field paste functionality</p>
-      <br>
-      <button onclick="toggleHelp()" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Close Help</button>
-    </div>
-
     <script>
-      /* ===== Minimal 16:9 sizing logic =====
-         Fits the largest 16:9 rectangle inside the viewport.
-         No stretch. Works everywhere. */
-      function sizeCanvas16x9() {
-        var canvas = document.getElementById('unity-canvas');
-        var container = document.getElementById('unity-container');
-
-        var vw = window.innerWidth;
-        var vh = window.innerHeight;
-
-        // compute the max 16:9 that fits in (vw, vh)
-        var targetW = Math.min(vw, Math.floor(vh * 16 / 9));
-        var targetH = Math.min(vh, Math.floor(vw * 9 / 16));
-
-        // pick the pair that fits
-        var useW, useH;
-        if (targetW * 9 / 16 <= vh) {
-          useW = targetW;
-          useH = Math.floor(targetW * 9 / 16);
-        } else {
-          useH = targetH;
-          useW = Math.floor(targetH * 16 / 9);
-        }
-
-        // apply size
-        container.style.width = useW + 'px';
-        container.style.height = useH + 'px';
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-      }
-      window.addEventListener('resize', sizeCanvas16x9);
-      window.addEventListener('orientationchange', sizeCanvas16x9);
-
-      // WebGL compatibility check (unchanged)
-      function checkWebGLSupport() {
-        try {
-          var canvas = document.createElement('canvas');
-          var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-          return gl !== null && gl !== undefined;
-        } catch (e) { return false; }
-      }
-      function showWebGLError(message) {
-        document.getElementById('error-message').textContent = message;
-        document.getElementById('webgl-error').style.display = 'block';
-        document.getElementById('unity-container').style.filter = 'blur(5px)';
-      }
-      function hideError() {
-        document.getElementById('webgl-error').style.display = 'none';
-        document.getElementById('unity-container').style.filter = 'none';
-      }
-      function showWebGLHelp() {
-        var helpText = "To fix WebGL issues:\n\n" +
-                      "1. Update your browser to the latest version\n" +
-                      "2. Enable WebGL in browser settings:\n" +
-                      "   - Chrome: chrome://flags → Enable WebGL\n" +
-                      "   - Firefox: about:config → Set webgl.disabled to false\n" +
-                      "3. Enable Hardware Acceleration in browser settings\n" +
-                      "4. Update your graphics drivers\n" +
-                      "5. Try a different browser";
-        alert(helpText);
-      }
-
-      // Video/Explorer/Clipboard helpers (unchanged)
-      function updateIframe(url){ console.log("Updating iframe with URL:", url); document.getElementById('video-iframe').src = url; document.getElementById('video-container').style.display = 'block'; }
-      function closeVideo(){ document.getElementById('video-container').style.display = 'none'; document.getElementById('video-iframe').src=''; }
-      function openFileExplorer(){ var input=document.createElement('input'); input.type='file'; input.multiple=true; input.webkitdirectory=true; input.onchange=function(e){ console.log('Selected files:', e.target.files); alert('Selected ' + e.target.files.length + ' files'); }; input.click(); }
-      function openDownloads(){ try{ window.open('file:///C:/Users/' + (navigator.userAgent.includes('Windows') ? (window.USERNAME || 'Default') : 'Default') + '/Downloads/', '_blank'); } catch(e){ alert('Cannot directly access Downloads folder due to browser security restrictions.\nTry using Ctrl+J to open downloads in Chrome or Ctrl+Shift+Y in Firefox.'); } }
-      function openDocuments(){ try{ window.open('file:///C:/Users/' + (navigator.userAgent.includes('Windows') ? (window.USERNAME || 'Default') : 'Default') + '/Documents/', '_blank'); } catch(e){ alert('Cannot directly access Documents folder due to browser security restrictions.\nConsider using the File Explorer option instead.'); } }
-      function closeExplorer(){ document.getElementById('explorer-helper').style.display='none'; }
-      function showExplorer(){ document.getElementById('explorer-helper').style.display='block'; }
-      function toggleHelp(){ var helpOverlay=document.getElementById('help-overlay'); var helpToggle=document.getElementById('help-toggle'); if (helpOverlay.style.display==='none'||helpOverlay.style.display===''){ helpOverlay.style.display='block'; helpToggle.style.display='none'; } else { helpOverlay.style.display='none'; helpToggle.style.display='block'; } }
-      window.updateIframe=updateIframe; window.showExplorer=showExplorer;
-      window.openURL=function(url){ window.open(url,'_blank'); };
-
-      window.copyToClipboard=function(text){
-        if(navigator.clipboard && (window.isSecureContext || location.protocol==='https:' || location.hostname==='localhost')){
-          navigator.clipboard.writeText(text).catch(()=>fallbackCopyTextToClipboard(text));
-        } else { fallbackCopyTextToClipboard(text); }
-      };
-      function fallbackCopyTextToClipboard(text){
-        var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.top='0'; ta.style.left='0';
-        document.body.appendChild(ta); ta.focus(); ta.select(); try{ document.execCommand('copy'); }catch{} document.body.removeChild(ta);
-      }
-      window.pasteFromClipboard=function(){
-        if(navigator.clipboard && window.isSecureContext){ return navigator.clipboard.readText().catch(()=>fallbackPasteFromClipboard()); }
-        return fallbackPasteFromClipboard();
-      };
-      function fallbackPasteFromClipboard(){
-        return new Promise((resolve)=>{
-          var tmp=document.createElement('input'); tmp.style.position='absolute'; tmp.style.left='-9999px'; tmp.style.opacity='0'; tmp.style.pointerEvents='none';
-          document.body.appendChild(tmp); tmp.focus(); tmp.select();
-          var ph=function(e){ var t=e.clipboardData.getData('text/plain'); document.body.removeChild(tmp); resolve(t||''); };
-          tmp.addEventListener('paste', ph, { once:true });
-          setTimeout(()=>{ try{ var ok=document.execCommand('paste'); if(!ok){ setTimeout(()=>{ if(document.body.contains(tmp)){ document.body.removeChild(tmp); resolve(''); } }, 3000); } } catch{ setTimeout(()=>{ if(document.body.contains(tmp)){ document.body.removeChild(tmp); resolve(''); } }, 3000); } }, 100);
-        });
-      }
-
-      document.addEventListener('keydown', function(e){
-        if(e.ctrlKey && e.key==='e'){ e.preventDefault(); var ex=document.getElementById('explorer-helper'); if(ex.style.display==='none'||ex.style.display===''){ showExplorer(); } else { closeExplorer(); } }
-        if(e.ctrlKey && e.shiftKey && e.key==='V'){ e.preventDefault(); var vc=document.getElementById('video-container'); var ifr=document.getElementById('video-iframe'); if(ifr.src && ifr.src!==''){ vc.style.display=(vc.style.display==='none'||vc.style.display==='')?'block':'none'; } }
-        if(e.key==='Escape'){ closeVideo(); closeExplorer(); hideError(); }
-      });
-      document.addEventListener('paste', function(){ console.log('Paste event detected'); });
-      document.addEventListener('contextmenu', function(e){
-        var a=document.activeElement;
-        if(a && (a.tagName==='INPUT' || a.tagName==='TEXTAREA')){ return; }
-      });
-
-      // Check WebGL support before loading Unity
-      if (!checkWebGLSupport()) {
-        showWebGLError("WebGL is not supported or enabled in your browser. Please check your browser settings.");
-      }
-
-      var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var warningBanner = document.querySelector("#unity-warning");
 
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
       function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
           warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
         var div = document.createElement('div');
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 2px;';
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
         else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 2px;';
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
           setTimeout(function() {
             warningBanner.removeChild(div);
             updateBannerVisibility();
@@ -307,93 +54,80 @@
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/GameCRIT.github.io.loader.js";
       var config = {
+        arguments: [],
         dataUrl: buildUrl + "/GameCRIT.github.io.data.unityweb",
         frameworkUrl: buildUrl + "/GameCRIT.github.io.framework.js.unityweb",
         codeUrl: buildUrl + "/GameCRIT.github.io.wasm.unityweb",
-        symbolsUrl: buildUrl + "/GameCRIT.github.io.symbols.json.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Gamecrit",
         productVersion: "1.0",
-        showBanner: unityShowBanner
-        // (default Unity behavior keeps WebGL size matched to the canvas DOM size)
+        showBanner: unityShowBanner,
+        // errorHandler: function(err, url, line) {
+        //    alert("error " + err + " occurred at line " + line);
+        //    // Return 'true' if you handled this error and don't want Unity
+        //    // to process it further, 'false' otherwise.
+        //    return true;
+        // },
       };
 
-      // NOTE: we REMOVE the old fixed desktop sizing to avoid stretch.
-      // if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) { ... } block kept minimal:
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
-        container.className = "unity-mobile";
+        document.querySelector("#unity-container").className = "unity-mobile";
         canvas.className = "unity-mobile";
-        // Optional: config.devicePixelRatio = 1;
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
       } else {
-        // Desktop: no fixed sizes — our resize function controls exact 16:9.
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
       }
 
-      // Ensure correct size before/after load
-      sizeCanvas16x9();
-
-      loadingBar.style.display = "block";
+      document.querySelector("#unity-loading-bar").style.display = "block";
 
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
-          progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => { unityInstance.SetFullscreen(1); };
-          window.unityInstance = unityInstance;
-          window.gameInstance = unityInstance;
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
 
-          // Minimal clipboard bits you had:
-          window.IsClipboardSupported = function() {
-            return (navigator.clipboard && navigator.clipboard.readText &&
-                    (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) ? 1 : 0;
-          };
-          window.RequestClipboardTextJS = function(objectName, methodName) {
-            if (navigator.clipboard && (window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost')) {
-              navigator.clipboard.readText().then(function(text) {
-                if (window.gameInstance && window.gameInstance.SendMessage) {
-                  window.gameInstance.SendMessage(objectName, methodName, text || "");
-                }
-              }).catch(function() {
-                if (window.gameInstance && window.gameInstance.SendMessage) {
-                  window.gameInstance.SendMessage(objectName, methodName, "");
-                }
+              }).catch((message) => {
+                alert(message);
               });
-            } else {
-              if (window.gameInstance && window.gameInstance.SendMessage) {
-                window.gameInstance.SendMessage(objectName, methodName, "");
-              }
-            }
-          };
+            };
 
-        }).catch((message) => {
-          console.error('Unity instance creation failed:', message);
-          showWebGLError('Failed to start the game: ' + message);
-        });
-      };
-      script.onerror = () => {
-        console.error('Failed to load Unity loader script');
-        showWebGLError('Failed to load game files. Please check your internet connection and try again.');
-      };
       document.body.appendChild(script);
 
-      // WebGL context loss handlers (unchanged)
-      canvas.addEventListener('webglcontextlost', function(e) {
-        console.error('WebGL context lost:', e);
-        showWebGLError('WebGL context was lost. Please try refreshing the page.');
-        e.preventDefault();
-      }, false);
-      canvas.addEventListener('webglcontextrestored', function(e) {
-        console.log('WebGL context restored:', e);
-        hideError();
-        sizeCanvas16x9();
-      }, false);
     </script>
   </body>
 </html>
