@@ -1,9 +1,18 @@
-# Unity WebGL - Uncompressed Build Headers
-/Build/*.wasm
+# Unity WebGL - Uncompressed Build Headers for Cloudflare Pages
+
+/Build/GameCRIT.github.io.loader.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/Build/GameCRIT.github.io.framework.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/Build/GameCRIT.github.io.wasm
   Content-Type: application/wasm
   Cache-Control: public, max-age=31536000
 
-/Build/*.data
+/Build/GameCRIT.github.io.data
   Content-Type: application/octet-stream
   Cache-Control: public, max-age=31536000
 
@@ -14,10 +23,3 @@
 /StreamingAssets/*
   Content-Type: application/octet-stream
   Cache-Control: public, max-age=31536000
-
-/*.html
-  Content-Type: text/html; charset=utf-8
-
-/*.json
-  Content-Type: application/json
-
