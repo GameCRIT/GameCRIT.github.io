@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameCRIT - Browser Compatibility Check</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .check-result {
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-size: 16px;
+    }
+    .success {
+      background: #d4edda;
+      border: 2px solid #28a745;
+      color: #155724;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      color: #856404;
+    }
+    .error {
+      background: #f8d7da;
+      border: 2px solid #dc3545;
+      color: #721c24;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+    .feature-list li {
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+    .feature-ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .feature-fail {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .feature-list li::before {
+      font-weight: bold;
+      margin-right: 10px;
+      font-size: 18px;
+    }
+    .feature-ok::before {
+      content: "✓";
+      color: #28a745;
+    }
+    .feature-fail::before {
+      content: "✗";
+      color: #dc3545;
+    }
+    .browser-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #667eea;
+    }
+    .solutions {
+      margin-top: 30px;
+    }
+    .solution-card {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 15px 0;
+      border-left: 5px solid #667eea;
+    }
+    .solution-card h3 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    .download-btn {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 12px 30px;
+      text-decoration: none;
+      border-radius: 8px;
+      margin: 10px 10px 10px 0;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .download-btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .portable-note {
+      background: #e7f3ff;
+      border: 2px solid #2196F3;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .portable-note strong {
+      color: #1976D2;
+    }
+    .continue-btn {
+      display: block;
+      width: 100%;
+      background: #28a745;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 30px;
+      transition: all 0.3s;
+    }
+    .continue-btn:hover {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+    .continue-btn.disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .tech-details {
+      font-size: 13px;
+      color: #666;
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 GameCRIT</h1>
+    <p class="subtitle">Browser Compatibility Checker</p>
+
+    <div id="results"></div>
+
+    <div class="tech-details">
+      <strong>Technical Requirements:</strong><br>
+      GameCRIT uses Unity WebGL technology which requires:<br>
+      • WebAssembly (WASM) support<br>
+      • WebGL for 3D graphics<br>
+      • Modern JavaScript (ES6+)<br>
+      • Fetch API for data loading
+    </div>
+  </div>
+
+  <script>
+    function detectBrowser() {
+      var ua = navigator.userAgent;
+      var browser = {
+        name: 'Unknown',
+        version: 0,
+        isOld: false,
+        isIE: false,
+        isEdgeLegacy: false
+      };
+      
+      if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident/') > -1) {
+        browser.name = 'Internet Explorer';
+        browser.isIE = true;
+        browser.isOld = true;
+        var match = ua.match(/(?:MSIE |rv:)(\d+)/);
+        browser.version = match ? parseInt(match[1]) : 0;
+        return browser;
+      }
+      
+      if (ua.indexOf('Edge/') > -1 && ua.indexOf('Edg/') === -1) {
+        browser.name = 'Edge (Legacy)';
+        browser.isEdgeLegacy = true;
+        browser.isOld = true;
+        var match = ua.match(/Edge\/(\d+)/);
+        browser.version = match ? parseInt(match[1]) : 0;
+        return browser;
+      }
+      
+      if (ua.indexOf('Chrome') > -1 && ua.indexOf('Edg') === -1) {
+        browser.name = 'Chrome';
+        var match = ua.match(/Chrome\/(\d+)/);
+        browser.version = match ? parseInt(match[1]) : 0;
+        browser.isOld = browser.version < 57;
+        return browser;
+      }
+      
+      if (ua.indexOf('Firefox') > -1) {
+        browser.name = 'Firefox';
+        var match = ua.match(/Firefox\/(\d+)/);
+        browser.version = match ? parseInt(match[1]) : 0;
+        browser.isOld = browser.version < 52;
+        return browser;
+      }
+      
+      if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) {
+        browser.name = 'Safari';
+        var match = ua.match(/Version\/(\d+)/);
+        browser.version = match ? parseInt(match[1]) : 0;
+        browser.isOld = browser.version < 11;
+        return browser;
+      }
+      
+      if (ua.indexOf('Edg/') > -1) {
+        browser.name = 'Edge';
+        var match = ua.match(/Edg\/(\d+)/);
+        browser.version = match ? parseInt(match[1]) : 0;
+        browser.isOld = browser.version < 79;
+        return browser;
+      }
+      
+      return browser;
+    }
+
+    function checkWebGL() {
+      try {
+        var canvas = document.createElement('canvas');
+        var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        return gl !== null && gl !== undefined;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function checkWASM() {
+      try {
+        if (typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function') {
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function checkFetch() {
+      return typeof fetch !== 'undefined';
+    }
+
+    function runCompatibilityCheck() {
+      var browser = detectBrowser();
+      var hasWebGL = checkWebGL();
+      var hasWASM = checkWASM();
+      var hasFetch = checkFetch();
+      var isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
+
+      var canRun = hasWebGL && hasWASM && hasFetch && !browser.isIE && !browser.isEdgeLegacy;
+
+      var html = '';
+
+      // Browser info
+      html += '<div class="browser-info">';
+      html += '<strong>Your Browser:</strong> ' + browser.name;
+      if (browser.version > 0) {
+        html += ' version ' + browser.version;
+      }
+      html += '</div>';
+
+      // Feature checks
+      html += '<ul class="feature-list">';
+      html += '<li class="' + (hasWASM ? 'feature-ok' : 'feature-fail') + '">';
+      html += 'WebAssembly (WASM) - <strong>REQUIRED</strong> for Unity WebGL';
+      html += '</li>';
+      html += '<li class="' + (hasWebGL ? 'feature-ok' : 'feature-fail') + '">';
+      html += 'WebGL - Required for 3D graphics';
+      html += '</li>';
+      html += '<li class="' + (hasFetch ? 'feature-ok' : 'feature-fail') + '">';
+      html += 'Fetch API - Required for loading game data';
+      html += '</li>';
+      html += '<li class="' + (isHTTPS ? 'feature-ok' : 'feature-fail') + '">';
+      html += 'Secure Connection (HTTPS)';
+      html += '</li>';
+      html += '</ul>';
+
+      // Overall result
+      if (canRun) {
+        html += '<div class="check-result success">';
+        html += '<strong>✓ Your browser is compatible!</strong><br>';
+        html += 'You can run GameCRIT without any issues.';
+        html += '</div>';
+        html += '<a href="index.html" class="continue-btn">Continue to Game</a>';
+      } else if (browser.isIE) {
+        html += '<div class="check-result error">';
+        html += '<strong>✗ Internet Explorer is not supported</strong><br>';
+        html += 'Unity WebGL games CANNOT run on Internet Explorer because it does not support WebAssembly (WASM).<br><br>';
+        html += '<strong>There is no workaround.</strong> You must use a modern browser.';
+        html += '</div>';
+        html += generateSolutions(browser, true);
+      } else if (browser.isEdgeLegacy) {
+        html += '<div class="check-result error">';
+        html += '<strong>✗ Old Edge (Legacy) is not supported</strong><br>';
+        html += 'Your version of Edge is too old and does not support WebAssembly.<br><br>';
+        html += '<strong>Solution:</strong> Update to the new Chromium-based Microsoft Edge.';
+        html += '</div>';
+        html += generateSolutions(browser, true);
+      } else if (!hasWASM) {
+        html += '<div class="check-result error">';
+        html += '<strong>✗ WebAssembly (WASM) is not supported</strong><br>';
+        html += 'Your browser does not support WebAssembly, which is absolutely required for Unity WebGL games.<br><br>';
+        html += '<strong>There is no alternative or fallback.</strong> You must update your browser or use a different one.';
+        html += '</div>';
+        html += generateSolutions(browser, false);
+      } else {
+        html += '<div class="check-result warning">';
+        html += '<strong>⚠ Your browser has compatibility issues</strong><br>';
+        html += 'Some required features are missing. The game may not work properly.';
+        html += '</div>';
+        html += generateSolutions(browser, false);
+      }
+
+      document.getElementById('results').innerHTML = html;
+    }
+
+    function generateSolutions(browser, isCritical) {
+      var html = '<div class="solutions">';
+      html += '<h2>Solutions:</h2>';
+
+      // Solution 1: Update current browser
+      if (browser.name !== 'Unknown' && browser.name !== 'Internet Explorer') {
+        html += '<div class="solution-card">';
+        html += '<h3>Option 1: Update ' + browser.name + '</h3>';
+        html += '<p>The easiest solution is to update your current browser to the latest version.</p>';
+        
+        if (browser.name.includes('Chrome')) {
+          html += '<p>Go to: <code>chrome://settings/help</code> or download from:</p>';
+          html += '<a href="https://www.google.com/chrome/" class="download-btn" target="_blank">Download Chrome</a>';
+        } else if (browser.name.includes('Firefox')) {
+          html += '<p>Go to: <code>Menu → Help → About Firefox</code> or download from:</p>';
+          html += '<a href="https://www.mozilla.org/firefox/" class="download-btn" target="_blank">Download Firefox</a>';
+        } else if (browser.name.includes('Edge')) {
+          html += '<p>Go to: <code>edge://settings/help</code> or download from:</p>';
+          html += '<a href="https://www.microsoft.com/edge" class="download-btn" target="_blank">Download Edge</a>';
+        } else if (browser.name.includes('Safari')) {
+          html += '<p>Update macOS or iOS to get the latest Safari version.</p>';
+        }
+        html += '</div>';
+      }
+
+      // Solution 2: Download a modern browser
+      html += '<div class="solution-card">';
+      html += '<h3>Option 2: Download a Modern Browser</h3>';
+      html += '<p>Install one of these browsers that fully support Unity WebGL:</p>';
+      html += '<a href="https://www.google.com/chrome/" class="download-btn" target="_blank">Google Chrome</a>';
+      html += '<a href="https://www.mozilla.org/firefox/" class="download-btn" target="_blank">Mozilla Firefox</a>';
+      html += '<a href="https://www.microsoft.com/edge" class="download-btn" target="_blank">Microsoft Edge</a>';
+      html += '</div>';
+
+      // Solution 3: Portable browsers for school PCs
+      html += '<div class="solution-card">';
+      html += '<h3>Option 3: Portable Browser (No Admin Required)</h3>';
+      html += '<div class="portable-note">';
+      html += '<strong>🎓 For School Computers:</strong><br>';
+      html += 'If you cannot install software (no admin rights), use a portable browser that runs from a USB drive or folder without installation.';
+      html += '</div>';
+      html += '<p><strong>Portable Chrome:</strong></p>';
+      html += '<a href="https://portapps.io/app/chrome-portable/" class="download-btn" target="_blank">Chrome Portable</a>';
+      html += '<p><strong>Portable Firefox:</strong></p>';
+      html += '<a href="https://portableapps.com/apps/internet/firefox_portable" class="download-btn" target="_blank">Firefox Portable</a>';
+      html += '<p style="font-size: 14px; color: #666; margin-top: 15px;">';
+      html += '<strong>How to use:</strong><br>';
+      html += '1. Download the portable version to a USB drive or your Documents folder<br>';
+      html += '2. Extract/run it without installation<br>';
+      html += '3. Open GameCRIT in the portable browser';
+      html += '</p>';
+      html += '</div>';
+
+      // Solution 4: Contact IT
+      html += '<div class="solution-card">';
+      html += '<h3>Option 4: Contact School IT</h3>';
+      html += '<p>If you\'re on a school computer, ask your IT administrator to:</p>';
+      html += '<ul style="text-align: left;">';
+      html += '<li>Update the installed browsers to the latest versions</li>';
+      html += '<li>Install Google Chrome or Mozilla Firefox (if not already installed)</li>';
+      html += '<li>Enable WebGL in browser settings if disabled</li>';
+      html += '<li>Allow access to gamecrit.github.io domain</li>';
+      html += '</ul>';
+      html += '</div>';
+
+      html += '</div>';
+      return html;
+    }
+
+    // Run check on page load
+    runCompatibilityCheck();
+  </script>
+</body>
+</html>
+
+
+
+
+
+

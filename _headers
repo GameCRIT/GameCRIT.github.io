@@ -1,14 +1,127 @@
-/Build/*.wasm.br
-  Content-Encoding: br
+# Global headers for all files - CORS and security
+/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH
+  Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin
+  Access-Control-Max-Age: 86400
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Unity WebGL WASM files
+/Build/*.wasm
   Content-Type: application/wasm
-  Cache-Control: public, max-age=31536000
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
 
-/Build/*.framework.js.br
+/Build/*.wasm.br
+  Content-Type: application/wasm
   Content-Encoding: br
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity WebGL framework JavaScript files
+/Build/*.framework.js.unityweb
   Content-Type: application/javascript
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/Build/*.framework.js.unityweb.br
+  Content-Type: application/javascript
+  Content-Encoding: br
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity WebGL loader JavaScript (less aggressive caching)
+/Build/*.loader.js
+  Content-Type: application/javascript
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=3600
+
+# Unity WebGL data files
+/Build/*.data.unityweb
+  Content-Type: application/octet-stream
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/Build/*.data.unityweb.br
+  Content-Type: application/octet-stream
+  Content-Encoding: br
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity WebGL WASM code files
+/Build/*.wasm.unityweb
+  Content-Type: application/wasm
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/Build/*.wasm.unityweb.br
+  Content-Type: application/wasm
+  Content-Encoding: br
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity WebGL symbols (if present)
+/Build/*.symbols.json.unityweb
+  Content-Type: application/json
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/Build/*.symbols.json.unityweb.br
+  Content-Type: application/json
+  Content-Encoding: br
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML file - allow cross-origin embedding for Unity
+/index.html
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: public, max-age=3600
+  Cross-Origin-Resource-Policy: cross-origin
+
+# Streaming assets - Addressables bundles
+/StreamingAssets/aa/WebGL/*.bundle
+  Content-Type: application/octet-stream
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# Streaming assets - catalogs and metadata (shorter cache)
+/StreamingAssets/aa/catalog.json
+  Content-Type: application/json
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=3600
+
+/StreamingAssets/aa/catalog.bin
+  Content-Type: application/octet-stream
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=3600
+
+/StreamingAssets/aa/catalog.hash
+  Content-Type: text/plain
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=3600
+
+/StreamingAssets/aa/settings.json
+  Content-Type: application/json
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=3600
+
+# All other streaming assets
+/StreamingAssets/**
+  Content-Type: application/octet-stream
+  Cross-Origin-Resource-Policy: cross-origin
   Cache-Control: public, max-age=31536000
 
-/Build/*.data.br
-  Content-Encoding: br
-  Content-Type: application/octet-stream
-  Cache-Control: public, max-age=31536000
+# Template assets
+/TemplateData/*.css
+  Content-Type: text/css
+  Cache-Control: public, max-age=31536000, immutable
+
+/TemplateData/*.png
+  Content-Type: image/png
+  Cache-Control: public, max-age=31536000, immutable
+
+/TemplateData/*.ico
+  Content-Type: image/x-icon
+  Cache-Control: public, max-age=31536000, immutable
