@@ -317,6 +317,45 @@
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
       var warningBanner = document.querySelector("#unity-warning");
 
+      // Helper: can we actually go fullscreen in this context?
+      function canUseFullscreenHere() {
+        if (!document.fullscreenEnabled) return false;
+
+        // If we're not in an iframe, normal fullscreen is fine
+        if (window.self === window.top) return true;
+
+        // Inside an iframe: only allow if the host explicitly grants permission
+        try {
+          var frame = window.frameElement;
+          if (!frame) return false;
+          var allowAttr = (frame.getAttribute('allow') || '').toLowerCase();
+          var hasLegacyAttr = frame.hasAttribute('allowfullscreen');
+          if (hasLegacyAttr) return true;
+          if (allowAttr.indexOf('fullscreen') !== -1) return true;
+        } catch (e) {
+          // Cross‑origin or other issues: be conservative and say "no"
+          return false;
+        }
+        return false;
+      }
+
+      function requestGameFullscreen(unityInstance) {
+        if (!canUseFullscreenHere()) {
+          alert("Fullscreen is disabled in this embedded view.\n\nTo play in fullscreen, open GameCRIT in its own tab or ask the site owner to enable fullscreen for this embed.");
+          return;
+        }
+
+        // Use browser fullscreen on our fixed‑aspect container/canvas.
+        // Our sizeCanvas16x9() logic keeps the game strictly 16:9, so on
+        // 16:10 or ultra‑wide screens you’ll see black bars instead of stretch.
+        try {
+          var target = container || canvas;
+          if (target && target.requestFullscreen) {
+            target.requestFullscreen().catch(function () { /* ignore */ });
+          }
+        } catch (e) { /* ignore */ }
+      }
+
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
           warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
@@ -376,7 +415,10 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => { unityInstance.SetFullscreen(1); };
+          // Unity footer fullscreen button
+          fullscreenButton.onclick = function () {
+            requestGameFullscreen(unityInstance);
+          };
           window.unityInstance = unityInstance;
           window.gameInstance = unityInstance;
 
@@ -384,18 +426,7 @@
           var cornerFsButton = document.getElementById('fullscreen-corner-button');
           if (cornerFsButton) {
             cornerFsButton.onclick = function () {
-              try {
-                // Try browser fullscreen on the canvas/container first (helps when embedded)
-                var target = container || canvas;
-                if (target && target.requestFullscreen) {
-                  target.requestFullscreen().catch(function () { /* ignore */ });
-                }
-              } catch (e) { /* ignore */ }
-
-              // Always ask Unity to go fullscreen too
-              if (unityInstance && typeof unityInstance.SetFullscreen === 'function') {
-                unityInstance.SetFullscreen(1);
-              }
+              requestGameFullscreen(unityInstance);
             };
           }
 
